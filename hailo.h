@@ -18,6 +18,8 @@ private:
 	Image   background;
 	TextureManager characterTexture;
 	Image character;
+	TextureManager cloudTexture;
+	Image cloud;
 
 public:
     // Constructor

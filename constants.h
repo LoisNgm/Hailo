@@ -26,6 +26,7 @@
 // graphic images
 const char BACKGROUND_IMAGE[] = "pictures\\background_without_clouds.png";  // background
 const char CHARACTER_IMAGE[] = "pictures\\character_white.png";//character
+const char CLOUD_IMAGE[] = "pictures\\clouds.png";//cloud
 
 // window
 const char CLASS_NAME[] = "Hailo";
@@ -33,6 +34,7 @@ const char GAME_TITLE[] = "Hailo";
 const bool FULLSCREEN = false;             // windowed or fullscreen
 const UINT GAME_WIDTH =  800;               // width of game in pixels
 const UINT GAME_HEIGHT = 600;               // height of game in pixels
+const int ObjectDeopPosition[19] = { 10, 50, 90, 130, 170, 210, 250, 290, 330, 370, 410, 450, 490, 530, 570, 610, 650, 730 };
 
  
 // game
@@ -49,6 +51,6 @@ const UCHAR ESC_KEY      = VK_ESCAPE;   // escape key
 const UCHAR ALT_KEY      = VK_MENU;     // Alt key
 const UCHAR ENTER_KEY    = VK_RETURN;   // Enter key
 
-
+const float CHARACTER_SPEED = 100.0f;
 
 #endif
