@@ -32,8 +32,8 @@ const char CLOUD_IMAGE[] = "pictures\\clouds.png";//cloud
 const char CLASS_NAME[] = "Hailo";
 const char GAME_TITLE[] = "Hailo";
 const bool FULLSCREEN = false;             // windowed or fullscreen
-const UINT GAME_WIDTH =  800;               // width of game in pixels
-const UINT GAME_HEIGHT = 600;               // height of game in pixels
+const UINT GAME_WIDTH =  1028;               // width of game in pixels
+const UINT GAME_HEIGHT = 768;               // height of game in pixels
 const int ObjectDeopPosition[19] = { 10, 50, 90, 130, 170, 210, 250, 290, 330, 370, 410, 450, 490, 530, 570, 610, 650, 730 };
 
  
