@@ -6,6 +6,7 @@
 #include "game.h"
 #include "textureManager.h"
 #include "image.h"
+#include <ctime>
 
 //=============================================================================
 // Create game class
@@ -18,9 +19,25 @@ private:
 	Image   background;
 	TextureManager characterTexture;
 	Image character;
+	TextureManager characterWalkingTexture;
+	Image characterWalking;
 	TextureManager cloudTexture;
 	Image cloud;
+	TextureManager hailTexture;
+	Image hail;
+	TextureManager snowTexture;
+	Image snow;
 
+	float gameTime = 0;
+	float lastSnowSpawnTime = 0;
+	float lastHailSpawnTime = 0;
+
+	//arrays
+	Image snowArrayImage[20];
+	Image hailArrayImage[20];
+
+
+	
 public:
     // Constructor
     Hailo();
@@ -36,6 +53,8 @@ public:
     void render();      // "
     void releaseAll();
     void resetAll();
+	void itemSpawn();
+	
 };
 
 #endif

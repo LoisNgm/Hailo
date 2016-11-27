@@ -25,8 +25,11 @@
 //-----------------------------------------------
 // graphic images
 const char BACKGROUND_IMAGE[] = "pictures\\background_without_clouds.png";  // background
-const char CHARACTER_IMAGE[] = "pictures\\character_white.png";//character
+const char CHARACTER_IMAGE[] = "pictures\\character_white_resting.png";//character
+const char CHARACTERWALKING_IMAGE[] = "pictures\\character_white_walking.png";//characterWALKING
 const char CLOUD_IMAGE[] = "pictures\\clouds.png";//cloud
+const char HAIL_IMAGE[] = "pictures\\Hail1.png";//hail
+const char SNOW_IMAGE[] = "pictures\\snow.png";//snow
 
 // window
 const char CLASS_NAME[] = "Hailo";
@@ -43,6 +46,7 @@ const float FRAME_RATE  = 200.0f;               // the target frame rate (frames
 const float MIN_FRAME_RATE = 10.0f;             // the minimum frame rate
 const float MIN_FRAME_TIME = 1.0f/FRAME_RATE;   // minimum desired time for 1 frame
 const float MAX_FRAME_TIME = 1.0f/MIN_FRAME_RATE; // maximum time used in calculations
+const float SNOW_SPAWNTIME = 2.0f;
 
 // key mappings
 // In this game simple constants are used for key mappings. If variables were used
@@ -51,6 +55,30 @@ const UCHAR ESC_KEY      = VK_ESCAPE;   // escape key
 const UCHAR ALT_KEY      = VK_MENU;     // Alt key
 const UCHAR ENTER_KEY    = VK_RETURN;   // Enter key
 
+
+
+//character variable
 const float CHARACTER_SPEED = 100.0f;
+
+//character 
+const int  CHARACTER_START_FRAME = 0;         // starting frame of CHARACTER animation
+const int  CHARACTER_END_FRAME = 3;           // last frame of CHARACTER animation
+const float CHARACTER_ANIMATION_DELAY = 0.2f; // time between frames of CHARACTER animation
+const int  CHARACTER_COLS = 4;                // CHARACTER texture has 1 columns
+const int  CHARACTER_WIDTH = 80;              // width of CHARACTER image
+const int  CHARACTER_HEIGHT = 112;             // height of CHARACTER image
+
+//characterWalking
+const int  CHARACTERWALKING_START_FRAME = 0;         // starting frame of CHARACTERWALKING animation
+const int  CHARACTERWALKING_END_FRAME = 9;           // last frame of CHARACTERWALKING animation
+const float CHARACTERWALKING_ANIMATION_DELAY = 0.3f; // time between frames of CHARACTERWALKING animation
+const int  CHARACTERWALKING_COLS = 9;                // CHARACTERWALKING texture has 1 columns
+const int  CHARACTERWALKING_WIDTH = 80;              // width of CHARACTERWALKING image
+const int  CHARACTERWALKING_HEIGHT = 112;             // height of CHARACTERWALKING image
+
+
+
+
+
 
 #endif
