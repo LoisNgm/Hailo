@@ -47,7 +47,7 @@ void Hailo::initialize(HWND hwnd)
 	if (!cloud.initialize(graphics, 0, 0, 0, &cloudTexture))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 	
-	character.setY(GAME_HEIGHT - character.getHeight() - 123);
+	character.setY(GAME_HEIGHT - character.getHeight() - 160);
 	
     return;
 }
