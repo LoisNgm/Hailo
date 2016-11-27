@@ -24,7 +24,7 @@
 //                  Constants
 //-----------------------------------------------
 // graphic images
-const char BACKGROUND_IMAGE[] = "pictures\\background_without_clouds.png";  // background
+const char BACKGROUND_IMAGE[] = "pictures\\background.png";  // background
 const char CHARACTER_IMAGE[] = "pictures\\character_white.png";//character
 const char CLOUD_IMAGE[] = "pictures\\clouds.png";//cloud
 
