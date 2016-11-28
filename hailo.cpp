@@ -1,5 +1,7 @@
 
 #include "hailo.h"
+#include <iostream>
+using namespace std;
 
 //=============================================================================
 // Constructor
@@ -118,67 +120,82 @@ void Hailo::update()
 	{
 		cloud.setX(cloud.getX() + frameTime * CHARACTER_SPEED);
 	}
-	//character controls...
-	characterWalking.update(frameTime);
-	if (input->isKeyDown(VK_RIGHT))            // if move right
+
+	//if else to prevent keyDown when freezing characters
+	if (enableKey)
 	{
-		
-		if (character.getX() > GAME_WIDTH - character.getWidth())               // if off screen right
-		{		
-			
-		}
-		else
+		//character controls...
+		characterWalking.update(frameTime);
+		if (input->isKeyDown(VK_RIGHT))            // if move right
 		{
-			character.setVisible(false);
-			character.setX(character.getX() + frameTime * CHARACTER_SPEED);
-			characterWalking.flipHorizontal(false);
-			characterWalking.setX(character.getX() + frameTime * CHARACTER_SPEED);
-			// for testing collision
-			/*if (collisionDetection()){
-				characterWalking.setVisible(false);
+
+			if (character.getX() > GAME_WIDTH - character.getWidth())               // if off screen right
+			{
+
 			}
 			else
 			{
-				characterWalking.setVisible(true);
-			}*/
-			characterWalking.setVisible(true);
-			characterWalking.update(frameTime);
-		}
-		
-	}
-	else
-	{
-		character.setVisible(true);
-		characterWalking.setVisible(false);
-	}
-	
-	if (input->isKeyDown(VK_LEFT))             // if move left
-	{
-		
-		if (character.getX() < 0)         // if off screen left
-		{
-		}
-		else
-		{
-			character.setVisible(false);
-			character.setX(character.getX() - frameTime * CHARACTER_SPEED);
-			characterWalking.flipHorizontal(true);
-			characterWalking.setX(character.getX() - frameTime * CHARACTER_SPEED);
-			// for testing collision
-			/*if (collisionDetection()){
+				character.setVisible(false);
+				character.setX(character.getX() + frameTime * CHARACTER_SPEED);
+				characterWalking.flipHorizontal(false);
+				characterWalking.setX(character.getX() + frameTime * CHARACTER_SPEED);
+				// for testing collision
+				/*if (collisionDetection()){
 				characterWalking.setVisible(false);
+				}
+				else
+				{
+				characterWalking.setVisible(true);
+				}*/
+				characterWalking.setVisible(true);
+				characterWalking.update(frameTime);
+			}
+
+		}
+		else{
+			character.setVisible(true);
+			characterWalking.setVisible(false);
+		}
+		if (input->isKeyDown(VK_LEFT))             // if move left
+		{
+
+			if (character.getX() < 0)         // if off screen left
+			{
 			}
 			else
 			{
+				character.setVisible(false);
+				character.setX(character.getX() - frameTime * CHARACTER_SPEED);
+				characterWalking.flipHorizontal(true);
+				characterWalking.setX(character.getX() - frameTime * CHARACTER_SPEED);
+				// for testing collision
+				/*if (collisionDetection()){
+					characterWalking.setVisible(false);
+					}
+					else
+					{
+					characterWalking.setVisible(true);
+					}*/
 				characterWalking.setVisible(true);
-			}*/
-			characterWalking.setVisible(true);
-			characterWalking.update(frameTime);
+				characterWalking.update(frameTime);
+			}
 		}
+		if (input->isKeyDown(VK_UP))             // if jump
+		{
+			jumping = true;					//to trigger jump
+		}
+		else
+			characterWalking.update(frameTime);
 	}
 	else
 	{
+
+		if (input->isKeyDown(VK_DOWN))             // if unfreezing
+		{
 		
+		}
+		else
+			characterWalking.update(frameTime);
 	}
 	characterWalking.update(frameTime);
 	
@@ -189,7 +206,38 @@ void Hailo::update()
 // Artificial Intelligence
 //=============================================================================
 void Hailo::ai()
-{}
+{
+	if (jumping)
+	{
+		if (increasingYAxisJump)
+		{
+			if (JumpTimer < 150)
+			{
+				JumpTimer+=3;
+				//increase Y axis
+				character.setY(character.getY() - frameTime * CHARACTER_JUMP_SPEED);
+				characterWalking.setY(characterWalking.getY() - frameTime * CHARACTER_JUMP_SPEED);
+				//cout << character.getY() << endl;
+			}
+			else
+				increasingYAxisJump = false;
+		} 
+		else
+		{
+			if (JumpTimer >0)
+			{
+				JumpTimer-=3;
+				character.setY(character.getY() + frameTime * CHARACTER_JUMP_SPEED);
+				characterWalking.setY(characterWalking.getY() + frameTime * CHARACTER_JUMP_SPEED);
+			}
+			else
+			{
+				jumping = false;							
+				increasingYAxisJump = true;			
+			}
+		}
+	}
+}
 
 //=============================================================================
 // Handle collisions

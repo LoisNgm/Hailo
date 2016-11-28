@@ -210,6 +210,7 @@ void Game::run(HWND hwnd)
     // Clear input
     // Call this after all key checks are done
     input->clear(inputNS::KEYS_PRESSED);
+
 }
 
 //=============================================================================

@@ -6,6 +6,8 @@
 #include <stdlib.h>             // for detecting memory leaks
 #include <crtdbg.h>             // for detecting memory leaks
 #include "hailo.h"
+#include <io.h>
+#include <fcntl.h>
 
 // Function prototypes
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int); 
@@ -35,6 +37,20 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     // Create the window
     if (!CreateMainWindow(hwnd, hInstance, nCmdShow))
         return 1;
+	//adding console
+	AllocConsole();
+
+	HANDLE handle_out = GetStdHandle(STD_OUTPUT_HANDLE);
+	int hCrt = _open_osfhandle((long)handle_out, _O_TEXT);
+	FILE* hf_out = _fdopen(hCrt, "w");
+	setvbuf(hf_out, NULL, _IONBF, 1);
+	*stdout = *hf_out;
+
+	HANDLE handle_in = GetStdHandle(STD_INPUT_HANDLE);
+	hCrt = _open_osfhandle((long)handle_in, _O_TEXT);
+	FILE* hf_in = _fdopen(hCrt, "r");
+	setvbuf(hf_in, NULL, _IONBF, 128);
+	*stdin = *hf_in;
 
     try{
         game->initialize(hwnd);     // throws GameError
