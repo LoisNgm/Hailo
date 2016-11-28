@@ -54,7 +54,7 @@ public:
     void releaseAll();
     void resetAll();
 	void itemSpawn();
-	
+	boolean collisionDetection();
 };
 
 #endif

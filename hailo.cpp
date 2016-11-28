@@ -133,6 +133,14 @@ void Hailo::update()
 			character.setX(character.getX() + frameTime * CHARACTER_SPEED);
 			characterWalking.flipHorizontal(false);
 			characterWalking.setX(character.getX() + frameTime * CHARACTER_SPEED);
+			// for testing collision
+			/*if (collisionDetection()){
+				characterWalking.setVisible(false);
+			}
+			else
+			{
+				characterWalking.setVisible(true);
+			}*/
 			characterWalking.setVisible(true);
 			characterWalking.update(frameTime);
 		}
@@ -156,6 +164,14 @@ void Hailo::update()
 			character.setX(character.getX() - frameTime * CHARACTER_SPEED);
 			characterWalking.flipHorizontal(true);
 			characterWalking.setX(character.getX() - frameTime * CHARACTER_SPEED);
+			// for testing collision
+			/*if (collisionDetection()){
+				characterWalking.setVisible(false);
+			}
+			else
+			{
+				characterWalking.setVisible(true);
+			}*/
 			characterWalking.setVisible(true);
 			characterWalking.update(frameTime);
 		}
@@ -166,6 +182,7 @@ void Hailo::update()
 	}
 	characterWalking.update(frameTime);
 	
+	collisionDetection();
 }
 
 //=============================================================================
@@ -294,4 +311,42 @@ void Hailo::itemSpawn()
 
 }
 
+boolean Hailo::collisionDetection(){
+	for (int i = 0; i < (sizeof(snowArrayImage) / sizeof(Image)); i++){
+		// character and snow
+		if ((character.getX() + character.getWidth()) >= (snowArrayImage[i].getX()) &&
+			(character.getWidth()) <= (snowArrayImage[i].getX() + snowArrayImage[i].getWidth()) &&
+			(character.getY() + character.getHeight()) >= (snowArrayImage[i].getY()) &&
+			(character.getY()) <= (snowArrayImage[i].getY() + snowArrayImage[i].getHeight())){
 
+			snowArrayImage[i].setY(30);//reset snow position
+			snowArrayImage[i].setVisible(false);//reuse snow object.
+			return true;
+		}
+		// character walking and snow
+		if ((characterWalking.getX() + characterWalking.getWidth()) >= (snowArrayImage[i].getX()) &&
+			(characterWalking.getWidth()) <= (snowArrayImage[i].getX() + snowArrayImage[i].getWidth()) &&
+			(characterWalking.getY() + characterWalking.getHeight()) >= (snowArrayImage[i].getY()) &&
+			(characterWalking.getY()) <= (snowArrayImage[i].getY() + snowArrayImage[i].getHeight())){
+
+			snowArrayImage[i].setY(30);//reset snow position
+			snowArrayImage[i].setVisible(false);//reuse snow object.
+			return true;
+		}
+		// character and hail
+		if ((character.getX() + character.getWidth()) >= (hailArrayImage[i].getX()) &&
+			(character.getWidth()) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
+			(character.getY() + character.getHeight()) >= (hailArrayImage[i].getY()) &&
+			(character.getY()) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
+			return true;
+		}
+		// character walking and hail
+		if ((characterWalking.getX() + characterWalking.getWidth()) >= (hailArrayImage[i].getX()) &&
+			(characterWalking.getWidth()) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
+			(characterWalking.getY() + characterWalking.getHeight()) >= (hailArrayImage[i].getY()) &&
+			(characterWalking.getY()) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
+			return true;
+		}
+	}
+	return false;
+}
