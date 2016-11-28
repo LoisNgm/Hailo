@@ -133,6 +133,14 @@ void Hailo::update()
 			character.setX(character.getX() + frameTime * CHARACTER_SPEED);
 			characterWalking.flipHorizontal(false);
 			characterWalking.setX(character.getX() + frameTime * CHARACTER_SPEED);
+			// for testing collision
+			/*if (collisionDetection()){
+				characterWalking.setVisible(false);
+			}
+			else
+			{
+				characterWalking.setVisible(true);
+			}*/
 			characterWalking.setVisible(true);
 			characterWalking.update(frameTime);
 		}
@@ -156,6 +164,14 @@ void Hailo::update()
 			character.setX(character.getX() - frameTime * CHARACTER_SPEED);
 			characterWalking.flipHorizontal(true);
 			characterWalking.setX(character.getX() - frameTime * CHARACTER_SPEED);
+			// for testing collision
+			/*if (collisionDetection()){
+				characterWalking.setVisible(false);
+			}
+			else
+			{
+				characterWalking.setVisible(true);
+			}*/
 			characterWalking.setVisible(true);
 			characterWalking.update(frameTime);
 		}
