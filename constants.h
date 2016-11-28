@@ -59,6 +59,7 @@ const UCHAR ENTER_KEY    = VK_RETURN;   // Enter key
 
 //character variable
 const float CHARACTER_SPEED = 100.0f;
+const float CHARACTER_JUMP_SPEED = 500.0f;
 
 //character 
 const int  CHARACTER_START_FRAME = 0;         // starting frame of CHARACTER animation

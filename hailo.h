@@ -31,7 +31,10 @@ private:
 	float gameTime = 0;
 	float lastSnowSpawnTime = 0;
 	float lastHailSpawnTime = 0;
-
+	int JumpTimer = 0;
+	bool jumping = false;
+	bool increasingYAxisJump = true;
+	bool enableKey = true;
 	//arrays
 	Image snowArrayImage[20];
 	Image hailArrayImage[20];
