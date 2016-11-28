@@ -166,6 +166,7 @@ void Hailo::update()
 	}
 	characterWalking.update(frameTime);
 	
+	collisionDetection();
 }
 
 //=============================================================================
