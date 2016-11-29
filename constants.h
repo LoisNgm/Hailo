@@ -30,7 +30,16 @@ const char CHARACTERWALKING_IMAGE[] = "pictures\\character_white_walking.png";//
 const char CLOUD_IMAGE[] = "pictures\\clouds.png";//cloud
 const char HAIL_IMAGE[] = "pictures\\Hail.png";//hail
 const char SNOW_IMAGE[] = "pictures\\snow.png";//snow
+const char FREEZE_IMAGE[] = "pictures\\freeze.png";//freeze
 
+const char MINUS_IMAGE[] = "pictures\\minus.png";//minus
+const char SLOW_IMAGE[] = "pictures\\slow.png";//slow
+const char SNOW_FAST_IMAGE[] = "pictures\\snow_fast.png";//snow_fast
+const char SNOW_INVINCIBLE_IMAGE[] = "pictures\\snow_invincible.png";//snow_invincible
+const char SNOWMAN_IMAGE[] = "pictures\\snowman.png";//snowman
+const char SNOWMAN_HEAD_IMAGE[] = "pictures\\snowman_head.png";//snowman_head
+const char SNOW_MINUS_IMAGE[] = "pictures\\snow_minus.png";//snow_minus
+const char SNOW_SLOW_IMAGE[] = "pictures\\snow_slow.png";//snow_slow
 // window
 const char CLASS_NAME[] = "Hailo";
 const char GAME_TITLE[] = "Hailo";
