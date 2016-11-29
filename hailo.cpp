@@ -111,81 +111,12 @@ void Hailo::initialize(HWND hwnd)
 void Hailo::update()
 {
 	itemSpawn();
-	//cloud's animation....
-	if (cloud.getX() > GAME_WIDTH) // position off screen left
-	{
-		cloud.setX((float)-cloud.getWidth());
-	}
-	else
-	{
-		cloud.setX(cloud.getX() + frameTime * CHARACTER_SPEED);
-	}
+	cloudAnimation();
 
 	//if else to prevent keyDown when freezing characters
 	if (enableKey)
 	{
-		//character controls...
-		characterWalking.update(frameTime);
-		if (input->isKeyDown(VK_RIGHT))            // if move right
-		{
-
-			if (character.getX() > GAME_WIDTH - character.getWidth())               // if off screen right
-			{
-
-			}
-			else
-			{
-				character.setVisible(false);
-				character.setX(character.getX() + frameTime * CHARACTER_SPEED);
-				characterWalking.flipHorizontal(false);
-				characterWalking.setX(character.getX() + frameTime * CHARACTER_SPEED);
-				// for testing collision
-				/*if (collisionDetection()){
-				characterWalking.setVisible(false);
-				}
-				else
-				{
-				characterWalking.setVisible(true);
-				}*/
-				characterWalking.setVisible(true);
-				characterWalking.update(frameTime);
-			}
-
-		}
-		else{
-			character.setVisible(true);
-			characterWalking.setVisible(false);
-		}
-		if (input->isKeyDown(VK_LEFT))             // if move left
-		{
-
-			if (character.getX() < 0)         // if off screen left
-			{
-			}
-			else
-			{
-				character.setVisible(false);
-				character.setX(character.getX() - frameTime * CHARACTER_SPEED);
-				characterWalking.flipHorizontal(true);
-				characterWalking.setX(character.getX() - frameTime * CHARACTER_SPEED);
-				// for testing collision
-				/*if (collisionDetection()){
-					characterWalking.setVisible(false);
-					}
-					else
-					{
-					characterWalking.setVisible(true);
-					}*/
-				characterWalking.setVisible(true);
-				characterWalking.update(frameTime);
-			}
-		}
-		if (input->isKeyDown(VK_UP))             // if jump
-		{
-			jumping = true;					//to trigger jump
-		}
-		else
-			characterWalking.update(frameTime);
+		characterControl();
 	}
 	else
 	{
@@ -303,29 +234,30 @@ void Hailo::resetAll()
 void Hailo::itemSpawn()
 {
 	gameTime += frameTime;//using time from game class
-
+	srand(time(0));
 	for (int i = 0; i < (sizeof(snowArrayImage) / sizeof(Image)); i++)// looping through the array
 	{
 		snowArrayImage[i].setDegrees(snowArrayImage[i].getDegrees() + 5);// snow rotating
 		if (snowArrayImage[i].getVisible())
 		{
-			
-				snowArrayImage[i].setY(snowArrayImage[i].getY() + frameTime * CHARACTER_SPEED);//snow travelling downwards
-				
-				if (snowArrayImage[i].getY() > GAME_HEIGHT)// checking for item out of screen
-				{
-					snowArrayImage[i].setY(30);//reset snow position
-					snowArrayImage[i].setVisible(false);//reuse snow object.
-				}
-			
+
+			snowArrayImage[i].setY(snowArrayImage[i].getY() + frameTime * CHARACTER_SPEED);//snow travelling downwards
+
+			if (snowArrayImage[i].getY() > 600)// checking for item out of screen
+			{
+				snowArrayImage[i].setY(30);//reset snow position
+				snowArrayImage[i].setVisible(false);//reuse snow object.
+			}
+
 		}
 		else
 		{
 			if ((gameTime - lastSnowSpawnTime) > 2)
 			{
-				snowArrayImage[i].setX(((rand() % 20 + 1)*30) + 10);
+				snowArrayImage[i].setX((rand() % 20 + 1) * (GAME_WIDTH / 20) + snowArrayImage[i].getWidth() / 2);
 				snowArrayImage[i].setVisible(true);//spawn snow
 				lastSnowSpawnTime = gameTime;//reset spawn time(r)
+				cout << "Snow: " << snowArrayImage[i].getX() << " , " << snowArrayImage[i].getY() << endl;
 			}
 		}
 	}
@@ -348,17 +280,17 @@ void Hailo::itemSpawn()
 		{
 			if ((gameTime - lastHailSpawnTime) > 2)
 			{
-				hailArrayImage[i].setX(((rand() % 20 + 1) * 30) + 10);
+				hailArrayImage[i].setX((rand() % 20 + 1) * (GAME_WIDTH / 20) + hailArrayImage[i].getWidth() / 2);
 				hailArrayImage[i].setVisible(true);//spawn hail
 				lastHailSpawnTime = gameTime;//reset spawn time(r)
+				cout << "Hail: " << hailArrayImage[i].getX() << " , " << hailArrayImage[i].getY() << endl;
 			}
 		}
 	}
-	
-	
+
+
 
 }
-
 boolean Hailo::collisionDetection(){
 	for (int i = 0; i < (sizeof(snowArrayImage) / sizeof(Image)); i++){
 		// character and snow
@@ -397,4 +329,84 @@ boolean Hailo::collisionDetection(){
 		}
 	}
 	return false;
+}
+void Hailo::cloudAnimation()
+{
+	//cloud's animation....
+	if (cloud.getX() > GAME_WIDTH) // position off screen left
+	{
+		cloud.setX((float)-cloud.getWidth());
+	}
+	else
+	{
+		cloud.setX(cloud.getX() + frameTime * CHARACTER_SPEED);
+	}
+}
+
+void Hailo::characterControl()
+{
+	//character controls...
+	characterWalking.update(frameTime);
+	if (input->isKeyDown(VK_RIGHT))            // if move right
+	{
+
+		if (character.getX() > GAME_WIDTH - character.getWidth())               // if off screen right
+		{
+
+		}
+		else
+		{
+			character.setVisible(false);
+			character.setX(character.getX() + frameTime * CHARACTER_SPEED);
+			characterWalking.flipHorizontal(false);
+			characterWalking.setX(character.getX() + frameTime * CHARACTER_SPEED);
+			// for testing collision
+			/*if (collisionDetection()){
+			characterWalking.setVisible(false);
+			}
+			else
+			{
+			characterWalking.setVisible(true);
+			}*/
+			characterWalking.setVisible(true);
+			characterWalking.update(frameTime);
+			cout << "Character: " << characterWalking.getX() << endl;
+		}
+
+	}
+	else{
+		character.setVisible(true);
+		characterWalking.setVisible(false);
+	}
+	if (input->isKeyDown(VK_LEFT))             // if move left
+	{
+
+		if (character.getX() < 0)         // if off screen left
+		{
+		}
+		else
+		{
+			character.setVisible(false);
+			character.setX(character.getX() - frameTime * CHARACTER_SPEED);
+			characterWalking.flipHorizontal(true);
+			characterWalking.setX(character.getX() - frameTime * CHARACTER_SPEED);
+			// for testing collision
+			/*if (collisionDetection()){
+			characterWalking.setVisible(false);
+			}
+			else
+			{
+			characterWalking.setVisible(true);
+			}*/
+			characterWalking.setVisible(true);
+			characterWalking.update(frameTime);
+			cout << "Character: " << characterWalking.getX() << endl;
+		}
+	}
+	if (input->isKeyDown(VK_UP))             // if jump
+	{
+		jumping = true;					//to trigger jump
+	}
+	else
+		characterWalking.update(frameTime);
 }

@@ -58,6 +58,8 @@ public:
     void resetAll();
 	void itemSpawn();
 	boolean collisionDetection();
+	void cloudAnimation();
+	void characterControl();
 };
 
 #endif
