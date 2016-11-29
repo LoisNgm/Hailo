@@ -82,11 +82,17 @@ const int  CHARACTER_HEIGHT = 112;             // height of CHARACTER image
 const int  CHARACTERWALKING_START_FRAME = 0;         // starting frame of CHARACTERWALKING animation
 const int  CHARACTERWALKING_END_FRAME = 9;           // last frame of CHARACTERWALKING animation
 const float CHARACTERWALKING_ANIMATION_DELAY = 0.3f; // time between frames of CHARACTERWALKING animation
-const int  CHARACTERWALKING_COLS = 9;                // CHARACTERWALKING texture has 1 columns
+const int  CHARACTERWALKING_COLS = 10;                // CHARACTERWALKING texture has 1 columns
 const int  CHARACTERWALKING_WIDTH = 80;              // width of CHARACTERWALKING image
 const int  CHARACTERWALKING_HEIGHT = 112;             // height of CHARACTERWALKING image
 
-
+//snowman
+const int  SNOWMAN_START_FRAME = 0;         // starting frame of SNOWMAN animation
+const int  SNOWMAN_END_FRAME = 3;           // last frame of SNOWMAN animation
+const float SNOWMAN_ANIMATION_DELAY = 0.3f; // time between frames of SNOWMAN animation
+const int  SNOWMAN_COLS = 4;                // SNOWMAN texture has 1 columns
+const int  SNOWMAN_WIDTH = 114;              // width of SNOWMAN image
+const int  SNOWMAN_HEIGHT = 127;             // height of SNOWMAN image
 
 
 
