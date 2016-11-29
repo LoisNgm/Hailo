@@ -403,9 +403,11 @@ void Hailo::characterControl()
 			cout << "Character: " << characterWalking.getX() << endl;
 		}
 	}
-	if (input->isKeyDown(VK_UP))             // if jump
+	if (input->wasKeyPressed(VK_UP))             // if jump
 	{
 		jumping = true;					//to trigger jump
+		cout << "true" << endl;
+		input->clearKeyPress(VK_UP);
 	}
 	else
 		characterWalking.update(frameTime);
