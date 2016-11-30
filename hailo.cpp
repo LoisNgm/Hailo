@@ -98,14 +98,10 @@ void Hailo::render()
 {
 	graphics->spriteBegin();                // begin drawing sprites
 	background.draw();
-	character.draw();
-	characterWalking.draw();
+	
 	snow.draw();
 	hail.draw();
 	cloud.draw();
-	freeze.draw();
-	minus.draw();
-	slow.draw();
 	snow_fast.draw();
 	snow_invicible.draw();
 	snowman.draw();
@@ -136,7 +132,11 @@ void Hailo::render()
 	{
 		snow_slowArrayImage[i].draw();
 	}
-
+	character.draw();
+	characterWalking.draw();
+	freeze.draw();
+	minus.draw();
+	slow.draw();
 	graphics->spriteEnd();                  // end drawing sprites
 
 }
