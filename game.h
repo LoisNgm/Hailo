@@ -34,7 +34,6 @@ protected:
     bool    paused;             // true if game is paused
 	bool    initialized;
 	TextDX  dxFont;                 // Default DirectX font
-	int Timer;						// Timer for game
 
 public:
     // Constructor

@@ -58,11 +58,11 @@ void Hailo::initialize(HWND hwnd)
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing DirectX font"));
 
 	// 62 pixel high Arial
-	if (dxFontMedium->initialize(graphics, 62, true, false, "Arial") == false)
+	if (dxFontMedium->initialize(graphics, 62, true, false, "Calibri") == false)
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing DirectX font"));
 
 	// 124 pixel high Arial
-	if (dxFontLarge->initialize(graphics, 124, true, false, "Arial") == false)
+	if (dxFontLarge->initialize(graphics, 124, true, false, "Calibri") == false)
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing DirectX font"));
 
 	if (dxFont.initialize(graphics, gameNS::POINT_SIZE, false, false, gameNS::FONT) == false)
@@ -75,7 +75,7 @@ void Hailo::initialize(HWND hwnd)
 int counting = 0;
 //=============================================================================
 // Update all game items
-//=============================================================================
+//======update=======================================================================
 void Hailo::update()
 {
 	itemSpawn();
@@ -96,6 +96,10 @@ void Hailo::update()
 	frozen();
 	
 	jumpingMethod();
+
+	Timer -= 1.0 / 60.0;
+	cout << Timer << endl;
+
 }
 
 //=============================================================================
@@ -168,7 +172,8 @@ void Hailo::render()
 
 	//dxFontSmall->setFontColor(graphicsNS::BLACK);
 	//dxFontMedium->setFontColor(graphicsNS::BLACK);
-	//dxFontLarge->setFontColor(graphicsNS::BLACK);
+	dxFontMedium->setFontColor(graphicsNS::WHITE);
+	dxFontMedium->print(to_string(Timer), 500, GAME_HEIGHT - 100);
 	//dxFontLarge->print("C", 20, 100);
 	//dxFontMedium->print("C", 114, 148);
 	//dxFontSmall->print("C", 164, 184);
