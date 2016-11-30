@@ -91,6 +91,10 @@ private:
 	int preventSameColumnSpawning[6];
 	
 	int p1Score;
+	clock_t begin = clock();
+	clock_t end;
+	int timer = 60;
+	int elapsed_secs = 0;
 
 public:
     // Constructor
@@ -117,6 +121,7 @@ public:
 	void importImage();
 	void snowAndHailArrayInitialization();
 	int getNonDuplicateRanNum();
+	int displayTimer();
 };
 
 #endif
