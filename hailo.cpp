@@ -96,10 +96,6 @@ void Hailo::update()
 	frozen();
 	
 	jumpingMethod();
-
-	Timer -= 1.0 / 60.0;
-	cout << Timer << endl;
-
 }
 
 //=============================================================================
@@ -173,7 +169,7 @@ void Hailo::render()
 	//dxFontSmall->setFontColor(graphicsNS::BLACK);
 	//dxFontMedium->setFontColor(graphicsNS::BLACK);
 	dxFontMedium->setFontColor(graphicsNS::WHITE);
-	dxFontMedium->print(to_string(Timer), 500, GAME_HEIGHT - 100);
+	dxFontMedium->print(to_string(displayTimer()), 500, GAME_HEIGHT - 100);
 	//dxFontLarge->print("C", 20, 100);
 	//dxFontMedium->print("C", 114, 148);
 	//dxFontSmall->print("C", 164, 184);
@@ -877,7 +873,18 @@ int Hailo::getNonDuplicateRanNum()
 				return tempRan;
 			}
 		}
-	} while (repeat);
-	
-	
+	} while (repeat);	
+}
+
+int Hailo::displayTimer(){
+	if (timer - elapsed_secs > 0){
+		end = clock();
+		elapsed_secs = int(end - begin) / CLOCKS_PER_SEC;
+		return timer - elapsed_secs;
+	}
+	else{
+		paused = true;
+		return 0;
+	}
+
 }
