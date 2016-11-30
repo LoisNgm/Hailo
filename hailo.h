@@ -15,41 +15,57 @@ class Hailo : public Game
 {
 private:
     // variables
-	TextureManager backgroundTexture;
-	Image   background;
+	//character 
 	TextureManager characterTexture;
 	Image character;
 	TextureManager characterWalkingTexture;
 	Image characterWalking;
+
+
+
+	TextureManager backgroundTexture;
+	Image   background;
+	
 	TextureManager cloudTexture;
 	Image cloud;
+	//dropping items
 	TextureManager hailTexture;
 	Image hail;
 	TextureManager snowTexture;
 	Image snow;
+	Image snow_fast;
+	Image snow_invicible;
+	Image snow_minus;
+	Image snow_slow;
+	TextureManager snow_fastTexture;
+	TextureManager snow_invincibleTexture;
+	TextureManager snow_minusTexture;
+	TextureManager snow_slowTexture;
+
+
+	//snowman
+	Image snowman;
+	Image snowman_head;
+	TextureManager snowmanTexture;
+	TextureManager snowman_headTexture;
+
+	//state of character
 	TextureManager freezeTexture;
 	Image freeze;
 	Image minus;
 	Image	slow;
-	Image snow_fast;
-	Image snow_invicible;
-	Image snowman;
-	Image snowman_head;
-	Image snow_minus;
-	Image snow_slow;
 	TextureManager minusTexture;
 	TextureManager	slowTexture;
-	TextureManager snow_fastTexture;
-	TextureManager snow_invicibleTexture;
-	TextureManager snowmanTexture;
-	TextureManager snowman_headTexture;
-	TextureManager snow_minusTexture;
-	TextureManager snow_slowTexture;
 
 
 	float gameTime = 0;
 	float lastSnowSpawnTime = 0;
 	float lastHailSpawnTime = 0;
+	float lastsnow_fastSpawnTime = 0;
+	float lastsnow_invincibleSpawnTime = 0;
+	float lastsnow_minusSpawnTime = 0;
+	float lastsnow_slowSpawnTime = 0;
+
 
 	int JumpTimer = 0;
 	int unFreezeTimer = 0;
@@ -63,8 +79,11 @@ private:
 	//arrays
 	Image snowArrayImage[20];
 	Image hailArrayImage[20];
-
-	int p1Score;
+	Image snow_fastArrayImage[20];
+	Image snow_invincibleArrayImage[20];
+	Image snow_minusArrayImage[20];
+	Image snow_slowArrayImage[20];
+	int preventSameColumnSpawning[6];
 	
 public:
     // Constructor
@@ -89,6 +108,8 @@ public:
 	void jumpingMethod();
 	void unfreeze();
 	void importImage();
+	void snowAndHailArrayInitialization();
+	int getNonDuplicateRanNum();
 };
 
 #endif
