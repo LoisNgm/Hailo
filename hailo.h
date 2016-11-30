@@ -7,6 +7,7 @@
 #include "textureManager.h"
 #include "image.h"
 #include <ctime>
+#include "textDX.h"
 
 //=============================================================================
 // Create game class
@@ -14,6 +15,10 @@
 class Hailo : public Game
 {
 private:
+	// game items	
+	TextDX  *dxFontSmall;       // DirectX fonts
+	TextDX  *dxFontMedium;
+	TextDX  *dxFontLarge;
     // variables
 	//character 
 	TextureManager characterTexture;
@@ -85,6 +90,8 @@ private:
 	Image snow_slowArrayImage[20];
 	int preventSameColumnSpawning[6];
 	
+	int p1Score;
+
 public:
     // Constructor
     Hailo();
