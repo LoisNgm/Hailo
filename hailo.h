@@ -27,14 +27,39 @@ private:
 	Image hail;
 	TextureManager snowTexture;
 	Image snow;
+	TextureManager freezeTexture;
+	Image freeze;
+	Image minus;
+	Image	slow;
+	Image snow_fast;
+	Image snow_invicible;
+	Image snowman;
+	Image snowman_head;
+	Image snow_minus;
+	Image snow_slow;
+	TextureManager minusTexture;
+	TextureManager	slowTexture;
+	TextureManager snow_fastTexture;
+	TextureManager snow_invicibleTexture;
+	TextureManager snowmanTexture;
+	TextureManager snowman_headTexture;
+	TextureManager snow_minusTexture;
+	TextureManager snow_slowTexture;
+
 
 	float gameTime = 0;
 	float lastSnowSpawnTime = 0;
 	float lastHailSpawnTime = 0;
+
 	int JumpTimer = 0;
+	int unFreezeTimer = 0;
 	bool jumping = false;
 	bool increasingYAxisJump = true;
 	bool enableKey = true;
+	bool stateOfUp = false;
+	bool stateOfDown = false;
+	int countDownKey = 0;
+	bool freezeState = false;
 	//arrays
 	Image snowArrayImage[20];
 	Image hailArrayImage[20];
@@ -58,6 +83,13 @@ public:
     void resetAll();
 	void itemSpawn();
 	boolean collisionDetection();
+	void cloudAnimation();
+	void characterControl();
+	void frozen();
+	void jumpingMethod();
+	void unfreeze();
+	void importImage();
 };
 
 #endif
+
