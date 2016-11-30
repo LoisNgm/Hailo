@@ -7,8 +7,15 @@
 #include <Mmsystem.h>
 #include "graphics.h"
 #include "input.h"
+#include "textDX.h"
 #include "constants.h"
 #include "gameError.h"
+namespace gameNS
+{
+	const char FONT[] = "Calibri";  // font
+	const int POINT_SIZE = 30;          // point size
+	const COLOR_ARGB FONT_COLOR = SETCOLOR_ARGB(255, 255, 255, 255);    // white
+}
 
 class Game
 {
@@ -25,7 +32,9 @@ protected:
     float   fps;                // frames per second
     DWORD   sleepTime;          // number of milli-seconds to sleep between frames
     bool    paused;             // true if game is paused
-    bool    initialized;
+	bool    initialized;
+	TextDX  dxFont;                 // Default DirectX font
+	int Timer;						// Timer for game
 
 public:
     // Constructor

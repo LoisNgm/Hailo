@@ -7,7 +7,11 @@ using namespace std;
 // Constructor
 //=============================================================================
 Hailo::Hailo()
-{}
+{
+	dxFontSmall = new TextDX();     // DirectX fonts
+	dxFontMedium = new TextDX();
+	dxFontLarge = new TextDX();
+}
 
 //=============================================================================
 // Destructor
@@ -15,6 +19,9 @@ Hailo::Hailo()
 Hailo::~Hailo()
 {
     releaseAll();           // call onLostDevice() for every graphics item
+	SAFE_DELETE(dxFontSmall);
+	SAFE_DELETE(dxFontMedium);
+	SAFE_DELETE(dxFontLarge);
 }
 
 //=============================================================================
@@ -46,7 +53,22 @@ void Hailo::initialize(HWND hwnd)
 	characterWalking.setVisible(false);
 	character.setVisible(true);
 	
-	
+	// 15 pixel high Arial
+	if (dxFontSmall->initialize(graphics, 15, true, false, "Arial") == false)
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing DirectX font"));
+
+	// 62 pixel high Arial
+	if (dxFontMedium->initialize(graphics, 62, true, false, "Arial") == false)
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing DirectX font"));
+
+	// 124 pixel high Arial
+	if (dxFontLarge->initialize(graphics, 124, true, false, "Arial") == false)
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing DirectX font"));
+
+	if (dxFont.initialize(graphics, gameNS::POINT_SIZE, false, false, gameNS::FONT) == false)
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Failed to initialize DirectX font."));
+
+
 	
     return;
 }
@@ -139,6 +161,27 @@ void Hailo::render()
 	minus.draw();
 	slow.draw();
 	graphics->spriteEnd();                  // end drawing sprites
+	const int BUF_SIZE = 20;
+	static char buffer[BUF_SIZE];
+
+	graphics->spriteBegin();
+
+	//dxFontSmall->setFontColor(graphicsNS::BLACK);
+	//dxFontMedium->setFontColor(graphicsNS::BLACK);
+	//dxFontLarge->setFontColor(graphicsNS::BLACK);
+	//dxFontLarge->print("C", 20, 100);
+	//dxFontMedium->print("C", 114, 148);
+	//dxFontSmall->print("C", 164, 184);
+	dxFont.setFontColor(gameNS::FONT_COLOR);
+	// convert score to Cstring
+	
+	_snprintf_s(buffer, BUF_SIZE, "P1\nScore: %d ", (int)p1Score);
+	dxFont.print(buffer, 100, GAME_HEIGHT - 100);
+	//_snprintf_s(buffer, BUF_SIZE, "P2\nScore: %d ", (int)p1Score);
+	//dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
+
+	graphics->spriteEnd();
+
 
 }
 
@@ -163,6 +206,9 @@ void Hailo::releaseAll()
 	snowman_headTexture.onLostDevice();
 	snow_minusTexture.onLostDevice();
 	snow_slowTexture.onLostDevice();
+	dxFontSmall->onLostDevice();
+	dxFontMedium->onLostDevice();
+	dxFontLarge->onLostDevice();
     Game::releaseAll();
     return;
 }
@@ -188,6 +234,9 @@ void Hailo::resetAll()
 	snowman_headTexture.onResetDevice();
 	snow_minusTexture.onResetDevice();
 	snow_slowTexture.onResetDevice();
+	dxFontSmall->onResetDevice();
+	dxFontMedium->onResetDevice();
+	dxFontLarge->onResetDevice();
     Game::resetAll();
     return;
 }
@@ -410,7 +459,7 @@ boolean Hailo::collisionDetection(){
 			(character.getY() + character.getHeight()) >= (hailArrayImage[i].getY()) &&
 			(character.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
 
-			p1Score += rand() % 51 + 50;
+			p1Score -= rand() % 51 + 50;
 
 			enableKey = false;
 			characterWalking.setVisible(false);
@@ -426,7 +475,7 @@ boolean Hailo::collisionDetection(){
 			(characterWalking.getY() + characterWalking.getHeight()) >= (hailArrayImage[i].getY()) &&
 			(characterWalking.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
 
-			p1Score += rand() % 51 + 50;
+			p1Score -= rand() % 51 + 50;
 
 			enableKey = false;
 			characterWalking.setVisible(false);
