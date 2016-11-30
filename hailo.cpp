@@ -231,6 +231,8 @@ boolean Hailo::collisionDetection(){
 			(character.getY() + character.getHeight()) >= (snowArrayImage[i].getY()) &&
 			(character.getY() + 10) <= (snowArrayImage[i].getY() + snowArrayImage[i].getHeight())){
 
+			p1Score += rand() % 100 + 1;
+
 			snowArrayImage[i].setY(30);//reset snow position
 			snowArrayImage[i].setVisible(false);//reuse snow object.
 			return true;
@@ -241,6 +243,8 @@ boolean Hailo::collisionDetection(){
 			(characterWalking.getY() + characterWalking.getHeight()) >= (snowArrayImage[i].getY()) &&
 			(characterWalking.getY() + 10) <= (snowArrayImage[i].getY() + snowArrayImage[i].getHeight())){
 
+			p1Score += rand() % 100 + 1;
+
 			snowArrayImage[i].setY(30);//reset snow position
 			snowArrayImage[i].setVisible(false);//reuse snow object.
 			return true;
@@ -250,6 +254,8 @@ boolean Hailo::collisionDetection(){
 			(character.getX() + 15) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
 			(character.getY() + character.getHeight()) >= (hailArrayImage[i].getY()) &&
 			(character.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
+
+			p1Score += rand() % 51 + 50;
 
 			enableKey = false;
 			characterWalking.setVisible(false);
@@ -264,6 +270,9 @@ boolean Hailo::collisionDetection(){
 			(characterWalking.getX() + 15) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
 			(characterWalking.getY() + characterWalking.getHeight()) >= (hailArrayImage[i].getY()) &&
 			(characterWalking.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
+
+			p1Score += rand() % 51 + 50;
+
 			enableKey = false;
 			characterWalking.setVisible(false);
 			character.setVisible(true);

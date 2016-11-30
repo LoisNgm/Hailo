@@ -64,7 +64,7 @@ private:
 	Image snowArrayImage[20];
 	Image hailArrayImage[20];
 
-
+	int p1Score;
 	
 public:
     // Constructor
