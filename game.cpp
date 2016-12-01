@@ -10,7 +10,7 @@ Game::Game()
 {
     input = new Input();        // initialize keyboard input immediately
     // additional initialization is handled in later call to input->initialize()
-    paused = false;             // game is not paused
+    paused = true;             // game is not paused
     graphics = NULL;
     initialized = false;
 }
