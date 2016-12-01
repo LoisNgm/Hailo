@@ -41,6 +41,10 @@ const char SNOWMAN_IMAGE[] = "pictures\\snowman.png";//snowman
 const char SNOWMAN_HEAD_IMAGE[] = "pictures\\snowman_head.png";//snowman_head
 const char SNOW_MINUS_IMAGE[] = "pictures\\snow_minus.png";//snow_minus
 const char SNOW_SLOW_IMAGE[] = "pictures\\snow_slow.png";//snow_slow
+
+// start_page
+const char START_PAGE_IMAGE[] = "pictures\\start_page.png";
+
 // window
 const char CLASS_NAME[] = "Hailo";
 const char GAME_TITLE[] = "Hailo";
