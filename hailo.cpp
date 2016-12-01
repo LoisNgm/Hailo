@@ -7,7 +7,11 @@ using namespace std;
 // Constructor
 //=============================================================================
 Hailo::Hailo()
-{}
+{
+	dxFontSmall = new TextDX();     // DirectX fonts
+	dxFontMedium = new TextDX();
+	dxFontLarge = new TextDX();
+}
 
 //=============================================================================
 // Destructor
@@ -66,7 +70,20 @@ void Hailo::initialize(HWND hwnd)
 	characterWalking.setVisible(false);
 	character.setVisible(true);
 	
-	
+	// 15 pixel high Arial
+	if (dxFontSmall->initialize(graphics, 15, true, false, "Arial") == false)
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing DirectX font"));
+
+	// 62 pixel high Arial
+	if (dxFontMedium->initialize(graphics, 62, true, false, "Calibri") == false)
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing DirectX font"));
+
+	// 124 pixel high Arial
+	if (dxFontLarge->initialize(graphics, 124, true, false, "Calibri") == false)
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing DirectX font"));
+
+	if (dxFont.initialize(graphics, gameNS::POINT_SIZE, false, false, gameNS::FONT) == false)
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Failed to initialize DirectX font."));
 	
     return;
 }
@@ -93,6 +110,7 @@ void Hailo::update()
 	snowman.update(frameTime);
 	buffStateCheck();
 	jumpingMethod();
+	checkHealth();
 }
 
 //=============================================================================
@@ -158,7 +176,26 @@ void Hailo::render()
 	freeze.draw();
 	minus.draw();
 	slow.draw();
-	graphics->spriteEnd();                  // end drawing sprites
+	const int BUF_SIZE = 20;
+	static char buffer[BUF_SIZE];
+	
+	//dxFontSmall->setFontColor(graphicsNS::BLACK);
+	//dxFontMedium->setFontColor(graphicsNS::BLACK);
+	dxFontMedium->setFontColor(graphicsNS::WHITE);
+	dxFontMedium->print(to_string(displayTimer()), 500, GAME_HEIGHT - 100);
+	//dxFontLarge->print("C", 20, 100);
+	//dxFontMedium->print("C", 114, 148);
+	//dxFontSmall->print("C", 164, 184);
+	dxFont.setFontColor(gameNS::FONT_COLOR);
+	// convert score to Cstring
+	
+	_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d", (int)p1Health);
+	dxFont.print(buffer, 100, GAME_HEIGHT - 100);
+	//_snprintf_s(buffer, BUF_SIZE, "P2\nScore: %d\n Health: %d");
+	//dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
+	
+	graphics->spriteEnd();
+
 
 }
 
@@ -215,185 +252,176 @@ void Hailo::resetAll()
 void Hailo::itemSpawn()
 {
 	gameTime += frameTime;//using time from game class
-		srand(time(0));
-		//int randomOnType = rand() % 6 + 1;
-			for (int i = 0; i < (sizeof(snowArrayImage) / sizeof(Image)); i++)// looping through the array
+	srand(time(0));
+	int randomOnType = rand() % 6 + 1;
+	for (int i = 0; i < (sizeof(snowArrayImage) / sizeof(Image)); i++)// looping through the array
+	{
+		snowArrayImage[i].setDegrees(snowArrayImage[i].getDegrees() + SNOW_ROTATION_RATE);// snow rotating
+		if (snowArrayImage[i].getVisible())
+		{
+
+			snowArrayImage[i].setY(snowArrayImage[i].getY() + frameTime * SNOW_SPEED);//snow travelling downwards
+
+			if (snowArrayImage[i].getY() > FLOOR)// checking for item out of screen
 			{
-				snowArrayImage[i].setDegrees(snowArrayImage[i].getDegrees() + SNOW_ROTATION_RATE);// snow rotating
-				if (snowArrayImage[i].getVisible())
-				{
-
-					snowArrayImage[i].setY(snowArrayImage[i].getY() + frameTime * SNOW_SPEED);//snow travelling downwards
-
-					if (snowArrayImage[i].getY() > FLOOR)// checking for item out of screen
-					{
-						snowArrayImage[i].setY(30);//reset snow position
-						snowArrayImage[i].setVisible(false);//reuse snow object.
-					}
-				}
-				else
-				{
-					if ((gameTime - lastSnowSpawnTime) > SPAWNTIME)
-					{
-						snowArrayImage[i].setX((rand()%20+1) * (GAME_WIDTH / 20) + snowArrayImage[i].getWidth() / 2);
-						snowArrayImage[i].setVisible(true);//spawn snow
-						lastSnowSpawnTime = gameTime;//reset spawn time(r)
-						cout << "Snow: " << snowArrayImage[i].getX() << " , " << snowArrayImage[i].getY() << endl;
-						break;
-					}
-				}
+				snowArrayImage[i].setY(30);//reset snow position
+				snowArrayImage[i].setVisible(false);//reuse snow object.
 			}
-			for (int i = 0; i < (sizeof(hailArrayImage) / sizeof(Image)); i++)// looping through the array
-		{
-				   hailArrayImage[i].setDegrees(hailArrayImage[i].getDegrees() + SNOW_ROTATION_RATE);// hail rotating
-				   if (hailArrayImage[i].getVisible())
-				   {
-
-					   hailArrayImage[i].setY(hailArrayImage[i].getY() + frameTime * SNOW_SPEED);//hail travelling downwards
-
-					   if (hailArrayImage[i].getY() > FLOOR)// checking for item out of screen
-					   {
-						   hailArrayImage[i].setY(30);//reset hail position
-						   hailArrayImage[i].setVisible(false);//reuse hail object.
-					   }
-
-				   }
-				   else
-				   {
-					   if ((gameTime - lastHailSpawnTime) > SPAWNTIME)
-					   {
-						   hailArrayImage[i].setX((rand()%20+1) * (GAME_WIDTH / 20) + hailArrayImage[i].getWidth() / 2);
-						   hailArrayImage[i].setVisible(true);//spawn hail
-						   lastHailSpawnTime = gameTime;//reset spawn time(r)
-						   cout << "Hail: " << hailArrayImage[i].getX() << " , " << hailArrayImage[i].getY() << endl;
-						   break;
-					   }
-				   }
 		}
-			   
-			for (int i = 0; i < (sizeof(snow_fastArrayImage) / sizeof(Image)); i++)// looping through the array
+		else
 		{
-				   snow_fastArrayImage[i].setDegrees(snow_fastArrayImage[i].getDegrees() + SNOW_ROTATION_RATE);// snow_fast rotating
-				   if (snow_fastArrayImage[i].getVisible())
-				   {
-
-					   snow_fastArrayImage[i].setY(snow_fastArrayImage[i].getY() + frameTime * SNOW_SPEED);//snow_fast travelling downwards
-
-					   if (snow_fastArrayImage[i].getY() > FLOOR)// checking for item out of screen
-					   {
-						   snow_fastArrayImage[i].setY(30);//reset snow_fast position
-						   snow_fastArrayImage[i].setVisible(false);//reuse snow_fast object.
-					   }
-
-				   }
-				   else
-				   {
-					   if ((gameTime - lastsnow_fastSpawnTime) > SPAWNTIME)
-					   {
-						   snow_fastArrayImage[i].setX((rand()%20+1) * (GAME_WIDTH / 20) + snow_fastArrayImage[i].getWidth() / 2);
-						   snow_fastArrayImage[i].setVisible(true);//spawn snow_fast
-						   lastsnow_fastSpawnTime = gameTime;//reset spawn time(r)
-						  cout << "snow_fast: " << snow_fastArrayImage[i].getX() << " , " << snow_fastArrayImage[i].getY() << endl;
-						   break;
-					   }
-				   }
-		}
-			
-			for (int i = 0; i < (sizeof(snow_invincibleArrayImage) / sizeof(Image)); i++)// looping through the array
-		{
-				   snow_invincibleArrayImage[i].setDegrees(snow_invincibleArrayImage[i].getDegrees() + SNOW_ROTATION_RATE);// snow_invincible rotating
-				   if (snow_invincibleArrayImage[i].getVisible())
-				   {
-
-					   snow_invincibleArrayImage[i].setY(snow_invincibleArrayImage[i].getY() + frameTime * SNOW_SPEED);//snow_invincible travelling downwards
-
-					   if (snow_invincibleArrayImage[i].getY() > FLOOR)// checking for item out of screen
-					   {
-						   snow_invincibleArrayImage[i].setY(30);//reset snow_invincible position
-						   snow_invincibleArrayImage[i].setVisible(false);//reuse snow_invincible object.
-					   }
-
-				   }
-				   else
-				   {
-					   if ((gameTime - lastsnow_invincibleSpawnTime) > SPAWNTIME)
-					   {
-						   snow_invincibleArrayImage[i].setX((rand()%20+1) * (GAME_WIDTH / 20) + snow_invincibleArrayImage[i].getWidth() / 2);
-						   snow_invincibleArrayImage[i].setVisible(true);//spawn snow_invincible
-						   lastsnow_invincibleSpawnTime = gameTime;//reset spawn time(r)
-						   cout << "snow_invincible: " << snow_invincibleArrayImage[i].getX() << " , " << snow_invincibleArrayImage[i].getY() << endl;
-						   break;
-					   }
-				   }
-		}
-			for (int i = 0; i < (sizeof(snow_minusArrayImage) / sizeof(Image)); i++)// looping through the array
+			if ((gameTime - lastSnowSpawnTime) > SPAWNTIME)
 			{
-				snow_minusArrayImage[i].setDegrees(snow_minusArrayImage[i].getDegrees() + SNOW_ROTATION_RATE);// snow_minus rotating
-				if (snow_minusArrayImage[i].getVisible())
-				{
-
-					snow_minusArrayImage[i].setY(snow_minusArrayImage[i].getY() + frameTime * SNOW_SPEED);//snow_minus travelling downwards
-
-					if (snow_minusArrayImage[i].getY() > FLOOR)// checking for item out of screen
-					{
-						snow_minusArrayImage[i].setY(30);//reset snow_minus position
-						snow_minusArrayImage[i].setVisible(false);//reuse snow_minus object.
-					}
-
-				}
-				else
-				{
-					if ((gameTime - lastsnow_minusSpawnTime) > SPAWNTIME)
-					{
-						snow_minusArrayImage[i].setX((rand()%20+1) * (GAME_WIDTH / 20) + snow_minusArrayImage[i].getWidth() / 2);
-						snow_minusArrayImage[i].setVisible(true);//spawn snow_minus
-						lastsnow_minusSpawnTime = gameTime;//reset spawn time(r)
-						cout << "snow_minus: " << snow_minusArrayImage[i].getX() << " , " << snow_minusArrayImage[i].getY() << endl;
-						break;
-					}
-				}
+				snowArrayImage[i].setX((rand() % 20 + 1) * (GAME_WIDTH / 20) + snowArrayImage[i].getWidth() / 2);
+				snowArrayImage[i].setVisible(true);//spawn snow
+				lastSnowSpawnTime = gameTime;//reset spawn time(r)
+				//cout << "Snow: " << snowArrayImage[i].getX() << " , " << snowArrayImage[i].getY() << endl;
+				break;
 			}
-			for (int i = 0; i < (sizeof(snow_slowArrayImage) / sizeof(Image)); i++)// looping through the array
+		}
+	}
+	for (int i = 0; i < (sizeof(hailArrayImage) / sizeof(Image)); i++)// looping through the array
+	{
+		hailArrayImage[i].setDegrees(hailArrayImage[i].getDegrees() + SNOW_ROTATION_RATE);// hail rotating
+		if (hailArrayImage[i].getVisible())
 		{
-				   snow_slowArrayImage[i].setDegrees(snow_slowArrayImage[i].getDegrees() + SNOW_ROTATION_RATE);// snow_slow rotating
-				   if (snow_slowArrayImage[i].getVisible())
-				   {
 
-					   snow_slowArrayImage[i].setY(snow_slowArrayImage[i].getY() + frameTime * SNOW_SPEED);//snow_slow travelling downwards
+			hailArrayImage[i].setY(hailArrayImage[i].getY() + frameTime * SNOW_SPEED);//hail travelling downwards
 
-					   if (snow_slowArrayImage[i].getY() > FLOOR)// checking for item out of screen
-					   {
-						   snow_slowArrayImage[i].setY(30);//reset snow_slow position
-						   snow_slowArrayImage[i].setVisible(false);//reuse snow_slow object.
-					   }
+			if (hailArrayImage[i].getY() > FLOOR)// checking for item out of screen
+			{
+				hailArrayImage[i].setY(30);//reset hail position
+				hailArrayImage[i].setVisible(false);//reuse hail object.
+			}
 
-				   }
-				   else
-				   {
-					   if ((gameTime - lastsnow_slowSpawnTime) > SPAWNTIME)
-					   {
-						   snow_slowArrayImage[i].setX((rand()%20+1) * (GAME_WIDTH / 20) + snow_slowArrayImage[i].getWidth() / 2);
-						   snow_slowArrayImage[i].setVisible(true);//spawn snow_slow
-						   lastsnow_slowSpawnTime = gameTime;//reset spawn time(r)
-						  cout << "snow_slow: " << snow_slowArrayImage[i].getX() << " , " << snow_slowArrayImage[i].getY() << endl;
-						   break;
-					   }
-				   }
-		}		
-	
-	
-	
-	
+		}
+		else
+		{
+			if ((gameTime - lastHailSpawnTime) > SPAWNTIME)
+			{
+				hailArrayImage[i].setX((rand() % 20 + 1) * (GAME_WIDTH / 20) + hailArrayImage[i].getWidth() / 2);
+				hailArrayImage[i].setVisible(true);//spawn hail
+				lastHailSpawnTime = gameTime;//reset spawn time(r)
+				//cout << "Hail: " << hailArrayImage[i].getX() << " , " << hailArrayImage[i].getY() << endl;
+				break;
+			}
+		}
+	}
+	for (int i = 0; i < (sizeof(snow_fastArrayImage) / sizeof(Image)); i++)// looping through the array
+	{
+		snow_fastArrayImage[i].setDegrees(snow_fastArrayImage[i].getDegrees() + SNOW_ROTATION_RATE);// snow_fast rotating
+		if (snow_fastArrayImage[i].getVisible())
+		{
 
+			snow_fastArrayImage[i].setY(snow_fastArrayImage[i].getY() + frameTime * SNOW_SPEED);//snow_fast travelling downwards
+
+			if (snow_fastArrayImage[i].getY() > FLOOR)// checking for item out of screen
+			{
+				snow_fastArrayImage[i].setY(30);//reset snow_fast position
+				snow_fastArrayImage[i].setVisible(false);//reuse snow_fast object.
+			}
+
+		}
+		else
+		{
+			if ((gameTime - lastsnow_fastSpawnTime) > SPAWNTIME)
+			{
+				snow_fastArrayImage[i].setX((rand() % 20 + 1) * (GAME_WIDTH / 20) + snow_fastArrayImage[i].getWidth() / 2);
+				snow_fastArrayImage[i].setVisible(true);//spawn snow_fast
+				lastsnow_fastSpawnTime = gameTime;//reset spawn time(r)
+				//cout << "snow_fast: " << snow_fastArrayImage[i].getX() << " , " << snow_fastArrayImage[i].getY() << endl;
+				break;
+			}
+		}
+	}
+	for (int i = 0; i < (sizeof(snow_invincibleArrayImage) / sizeof(Image)); i++)// looping through the array
+	{
+		snow_invincibleArrayImage[i].setDegrees(snow_invincibleArrayImage[i].getDegrees() + SNOW_ROTATION_RATE);// snow_invincible rotating
+		if (snow_invincibleArrayImage[i].getVisible())
+		{
+
+			snow_invincibleArrayImage[i].setY(snow_invincibleArrayImage[i].getY() + frameTime * SNOW_SPEED);//snow_invincible travelling downwards
+
+			if (snow_invincibleArrayImage[i].getY() > FLOOR)// checking for item out of screen
+			{
+				snow_invincibleArrayImage[i].setY(30);//reset snow_invincible position
+				snow_invincibleArrayImage[i].setVisible(false);//reuse snow_invincible object.
+			}
+
+		}
+		else
+		{
+			if ((gameTime - lastsnow_invincibleSpawnTime) > SPAWNTIME)
+			{
+				snow_invincibleArrayImage[i].setX((rand() % 20 + 1) * (GAME_WIDTH / 20) + snow_invincibleArrayImage[i].getWidth() / 2);
+				snow_invincibleArrayImage[i].setVisible(true);//spawn snow_invincible
+				lastsnow_invincibleSpawnTime = gameTime;//reset spawn time(r)
+				//cout << "snow_invincible: " << snow_invincibleArrayImage[i].getX() << " , " << snow_invincibleArrayImage[i].getY() << endl;
+				break;
+			}
+		}
+	}
+	for (int i = 0; i < (sizeof(snow_minusArrayImage) / sizeof(Image)); i++)// looping through the array
+	{
+		snow_minusArrayImage[i].setDegrees(snow_minusArrayImage[i].getDegrees() + SNOW_ROTATION_RATE);// snow_minus rotating
+		if (snow_minusArrayImage[i].getVisible())
+		{
+
+			snow_minusArrayImage[i].setY(snow_minusArrayImage[i].getY() + frameTime * SNOW_SPEED);//snow_minus travelling downwards
+
+			if (snow_minusArrayImage[i].getY() > FLOOR)// checking for item out of screen
+			{
+				snow_minusArrayImage[i].setY(30);//reset snow_minus position
+				snow_minusArrayImage[i].setVisible(false);//reuse snow_minus object.
+			}
+
+		}
+		else
+		{
+			if ((gameTime - lastsnow_minusSpawnTime) > SPAWNTIME)
+			{
+				snow_minusArrayImage[i].setX((rand() % 20 + 1) * (GAME_WIDTH / 20) + snow_minusArrayImage[i].getWidth() / 2);
+				snow_minusArrayImage[i].setVisible(true);//spawn snow_minus
+				lastsnow_minusSpawnTime = gameTime;//reset spawn time(r)
+				//cout << "snow_minus: " << snow_minusArrayImage[i].getX() << " , " << snow_minusArrayImage[i].getY() << endl;
+				break;
+			}
+		}
+	}
+	for (int i = 0; i < (sizeof(snow_slowArrayImage) / sizeof(Image)); i++)// looping through the array
+	{
+		snow_slowArrayImage[i].setDegrees(snow_slowArrayImage[i].getDegrees() + SNOW_ROTATION_RATE);// snow_slow rotating
+		if (snow_slowArrayImage[i].getVisible())
+		{
+
+			snow_slowArrayImage[i].setY(snow_slowArrayImage[i].getY() + frameTime * SNOW_SPEED);//snow_slow travelling downwards
+
+			if (snow_slowArrayImage[i].getY() > FLOOR)// checking for item out of screen
+			{
+				snow_slowArrayImage[i].setY(30);//reset snow_slow position
+				snow_slowArrayImage[i].setVisible(false);//reuse snow_slow object.
+			}
+
+		}
+		else
+		{
+			if ((gameTime - lastsnow_slowSpawnTime) > SPAWNTIME)
+			{
+				snow_slowArrayImage[i].setX((rand() % 20 + 1) * (GAME_WIDTH / 20) + snow_slowArrayImage[i].getWidth() / 2);
+				snow_slowArrayImage[i].setVisible(true);//spawn snow_slow
+				lastsnow_slowSpawnTime = gameTime;//reset spawn time(r)
+				//cout << "snow_slow: " << snow_slowArrayImage[i].getX() << " , " << snow_slowArrayImage[i].getY() << endl;
+				break;
+			}
+		}
+	}
 	for (int i = 0; i < (sizeof(preventSameColumnSpawning) / sizeof(int)); i++)
 	{
 		preventSameColumnSpawning[i] = 0;
 	}
 }
-
-
-
-boolean Hailo::collisionDetection(){
+boolean Hailo::collisionDetection()
+{
 	for (int i = 0; i < (sizeof(snowArrayImage) / sizeof(Image)); i++){
 		// character and snow
 		if ((character.getX() + character.getWidth() - 20) >= (snowArrayImage[i].getX()) &&
@@ -413,33 +441,42 @@ boolean Hailo::collisionDetection(){
 			snowArrayImage[i].setVisible(false);//reuse snow object.
 			return true;
 		}
-		if (buffState != 2)
-		{
-			// character and hail
-			if ((character.getX() + character.getWidth() - 20) >= (hailArrayImage[i].getX()) &&
-				(character.getX() + 15) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
-				(character.getY() + character.getHeight()) >= (hailArrayImage[i].getY()) &&
-				(character.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
-				enableKey = false;
-				characterWalking.setVisible(false);
-				character.setVisible(true);
-				freezeState = true;
-				hailArrayImage[i].setY(30);//reset hail position
-				hailArrayImage[i].setVisible(false);//reuse hail object.
-				return true;
-			}
-			// character walking and hail
-			if ((characterWalking.getX() + characterWalking.getWidth() - 20) >= (hailArrayImage[i].getX()) &&
-				(characterWalking.getX() + 15) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
-				(characterWalking.getY() + characterWalking.getHeight()) >= (hailArrayImage[i].getY()) &&
-				(characterWalking.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
-				enableKey = false;
-				characterWalking.setVisible(false);
-				character.setVisible(true);
-				freezeState = true;				
-				hailArrayImage[i].setY(30);//reset hail position
-				hailArrayImage[i].setVisible(false);//reuse hail object.
-				return true;
+		// character and hail
+		if ((character.getX() + character.getWidth() - 20) >= (hailArrayImage[i].getX()) &&
+			(character.getX() + 15) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
+			(character.getY() + character.getHeight()) >= (hailArrayImage[i].getY()) &&
+			(character.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
+
+			p1Score -= rand() % 51 + 50;
+			p1Health--;
+			if (buffState != 2)
+			{
+				// character and hail
+				if ((character.getX() + character.getWidth() - 20) >= (hailArrayImage[i].getX()) &&
+					(character.getX() + 15) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
+					(character.getY() + character.getHeight()) >= (hailArrayImage[i].getY()) &&
+					(character.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
+					enableKey = false;
+					characterWalking.setVisible(false);
+					character.setVisible(true);
+					freezeState = true;
+					hailArrayImage[i].setY(30);//reset hail position
+					hailArrayImage[i].setVisible(false);//reuse hail object.
+					return true;
+				}
+				// character walking and hail
+				if ((characterWalking.getX() + characterWalking.getWidth() - 20) >= (hailArrayImage[i].getX()) &&
+					(characterWalking.getX() + 15) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
+					(characterWalking.getY() + characterWalking.getHeight()) >= (hailArrayImage[i].getY()) &&
+					(characterWalking.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
+					enableKey = false;
+					characterWalking.setVisible(false);
+					character.setVisible(true);
+					freezeState = true;
+					hailArrayImage[i].setY(30);//reset hail position
+					hailArrayImage[i].setVisible(false);//reuse hail object.
+					return true;
+				}
 			}
 			//Colliding with downgrades
 			//Character and slow speed snow
@@ -466,11 +503,11 @@ boolean Hailo::collisionDetection(){
 				characterWalking.setVisible(false);
 				character.setVisible(true);
 				snow_slowArrayImage[i].setY(30);
-				snow_slowArrayImage[i].setVisible(false);		
+				snow_slowArrayImage[i].setVisible(false);
 				buffTiming = 5000;
 				fast.setVisible(false);
 				buffState = 3;
-				velocity =50;
+				velocity = 50;
 				return true;
 			}
 
@@ -510,7 +547,7 @@ boolean Hailo::collisionDetection(){
 			character.setVisible(true);
 			snow_invincibleArrayImage[i].setY(30);//reset invincible position
 			snow_invincibleArrayImage[i].setVisible(false);//reuse invincible object.
-			buffState = 2;		
+			buffState = 2;
 			buffTiming = 5000;
 			velocity = 100;
 			slow.setVisible(false);
@@ -531,37 +568,47 @@ boolean Hailo::collisionDetection(){
 			slow.setVisible(false);
 			return true;
 		}
+		// character walking and hail
+		if ((characterWalking.getX() + characterWalking.getWidth() - 20) >= (hailArrayImage[i].getX()) &&
+			(characterWalking.getX() + 15) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
+			(characterWalking.getY() + characterWalking.getHeight()) >= (hailArrayImage[i].getY()) &&
+			(characterWalking.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
 
-		// character and speed increase snownball
-		if ((character.getX() + character.getWidth() - 20) >= (snow_fastArrayImage[i].getX()) &&
-			(character.getX() + 15) <= (snow_fastArrayImage[i].getX() + snow_fastArrayImage[i].getWidth()) &&
-			(character.getY() + character.getHeight()) >= (snow_fastArrayImage[i].getY()) &&
-			(character.getY() + 10) <= (snow_fastArrayImage[i].getY() + snow_fastArrayImage[i].getHeight())){
-			characterWalking.setVisible(false);
-			character.setVisible(true);
-			snow_fastArrayImage[i].setY(30);
-			snow_fastArrayImage[i].setVisible(false);
-			buffTiming = 5000;
-			buffState = 1;
-			velocity = 200;
-			return true;
+			p1Score -= rand() % 51 + 50;
+			p1Health--;
+			enableKey = false;
+
+			// character and speed increase snownball
+			if ((character.getX() + character.getWidth() - 20) >= (snow_fastArrayImage[i].getX()) &&
+				(character.getX() + 15) <= (snow_fastArrayImage[i].getX() + snow_fastArrayImage[i].getWidth()) &&
+				(character.getY() + character.getHeight()) >= (snow_fastArrayImage[i].getY()) &&
+				(character.getY() + 10) <= (snow_fastArrayImage[i].getY() + snow_fastArrayImage[i].getHeight())){
+				characterWalking.setVisible(false);
+				character.setVisible(true);
+				snow_fastArrayImage[i].setY(30);
+				snow_fastArrayImage[i].setVisible(false);
+				buffTiming = 5000;
+				buffState = 1;
+				velocity = 200;
+				return true;
+			}
+			// character walking and speed increase snownball
+			if ((characterWalking.getX() + characterWalking.getWidth() - 20) >= (snow_fastArrayImage[i].getX()) &&
+				(characterWalking.getX() + 15) <= (snow_fastArrayImage[i].getX() + snow_fastArrayImage[i].getWidth()) &&
+				(characterWalking.getY() + characterWalking.getHeight()) >= (snow_fastArrayImage[i].getY()) &&
+				(characterWalking.getY() + 10) <= (snow_fastArrayImage[i].getY() + snow_fastArrayImage[i].getHeight())){
+				characterWalking.setVisible(false);
+				character.setVisible(true);
+				snow_fastArrayImage[i].setY(30);
+				snow_fastArrayImage[i].setVisible(false);
+				buffTiming = 5000;
+				buffState = 1;
+				velocity = 200;
+				return true;
+			}
 		}
-		// character walking and speed increase snownball
-		if ((characterWalking.getX() + characterWalking.getWidth() - 20) >= (snow_fastArrayImage[i].getX()) &&
-			(characterWalking.getX() + 15) <= (snow_fastArrayImage[i].getX() + snow_fastArrayImage[i].getWidth()) &&
-			(characterWalking.getY() + characterWalking.getHeight()) >= (snow_fastArrayImage[i].getY()) &&
-			(characterWalking.getY() + 10) <= (snow_fastArrayImage[i].getY() + snow_fastArrayImage[i].getHeight())){
-			characterWalking.setVisible(false);
-			character.setVisible(true);
-			snow_fastArrayImage[i].setY(30);
-			snow_fastArrayImage[i].setVisible(false);
-			buffTiming = 5000;
-			buffState = 1;
-			velocity = 200;
-			return true;
-		}
+		return false;
 	}
-	return false;
 }
 void Hailo::cloudAnimation()
 {
@@ -995,46 +1042,46 @@ int Hailo::getNonDuplicateRanNum()
 }
 void Hailo::buffStateCheck()
 {
-		if (buffState == 1)//fast speed
+	if (buffState == 1)//fast speed
+	{
+		if (buffTiming != 0)
 		{
-			if (buffTiming != 0)
-			{
-				buffTiming--;
-				fast.setVisible(true);
-				fast.setX(character.getCenterX() - fast.getWidth() / 2);
-				fast.setY(character.getCenterY() - fast.getHeight() / 2);
-				fast.update(frameTime);
-			}
-			else
-			{
-				cout << velocity << endl;
-				buffState = 0;
-				velocity = 100;
-				fast.setVisible(false);
-			}
+			buffTiming--;
+			fast.setVisible(true);
+			fast.setX(character.getCenterX() - fast.getWidth() / 2);
+			fast.setY(character.getCenterY() - fast.getHeight() / 2);
+			fast.update(frameTime);
 		}
+		else
+		{
+			cout << velocity << endl;
+			buffState = 0;
+			velocity = 100;
+			fast.setVisible(false);
+		}
+	}
 	else if (buffState == 2)
 	{
 		if (buffTiming != 0)
 		{
-				if (invincibleTime<=2)
-				{
-			      /*character.setVisible(false);		
-				characterWalking.setVisible(false);*/	character.setColorFilter(graphicsNS::GREEN);
-				characterWalking.setColorFilter(graphicsNS::GREEN);
-				//character.se
-				}
-				else
-				{
+			if (invincibleTime <= 2)
+			{
+				/*character.setVisible(false);
+			  characterWalking.setVisible(false);*/	character.setColorFilter(graphicsNS::GREEN);
+			characterWalking.setColorFilter(graphicsNS::GREEN);
+			//character.se
+			}
+			else
+			{
 				/*	if (input->isKeyDown(VK_UP) || input->isKeyDown(VK_LEFT) || input->isKeyDown(VK_RIGHT))
 						characterWalking.setVisible(true);
-					else
+						else
 						character.setVisible(true);*/
-						character.setColorFilter(graphicsNS::BLACK);
-					characterWalking.setColorFilter(graphicsNS::BLACK);					
-				}
-				if (invincibleTime >= 400)
-					invincibleTime= 0;				
+				character.setColorFilter(graphicsNS::BLACK);
+				characterWalking.setColorFilter(graphicsNS::BLACK);
+			}
+			if (invincibleTime >= 400)
+				invincibleTime = 0;
 			buffTiming--;
 			invincibleTime++;
 		}
@@ -1067,12 +1114,29 @@ void Hailo::buffStateCheck()
 		if (buffTiming != 0)
 		{
 			buffTiming--;
-
-			
 		}
 		else
 		{
 			buffState = 0;
 		}
 	}
+}
+
+void Hailo::checkHealth(){
+	if (p1Health <= 0)
+		cout << "game end" << endl;
+}
+int Hailo::displayTimer(){
+	if (timer - elapsed_secs > 0){
+		end = clock();
+		elapsed_secs = int(end - begin) / CLOCKS_PER_SEC;
+		return timer - elapsed_secs;
+		
+	}
+	else{
+		paused = true;
+		return 0;
+		
+	}
+	
 }
