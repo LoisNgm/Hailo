@@ -138,6 +138,7 @@ void Hailo::render()
 	if (gameStart == 0){
 		startPage.draw();
 		if (input->anyKeyPressed()){
+			begin = clock();
 			gameStart = 1;
 			paused = false;
 		}
