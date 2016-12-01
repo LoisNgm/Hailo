@@ -566,7 +566,7 @@ boolean Hailo::collisionDetection()
 			return true;
 		}
 
-		// character and speed increase snownball
+		// character and speed increase snowball
 		if ((character.getX() + character.getWidth() - 20) >= (snow_fastArrayImage[i].getX()) &&
 			(character.getX() + 15) <= (snow_fastArrayImage[i].getX() + snow_fastArrayImage[i].getWidth()) &&
 			(character.getY() + character.getHeight()) >= (snow_fastArrayImage[i].getY()) &&
@@ -582,7 +582,7 @@ boolean Hailo::collisionDetection()
 			fast.setVisible(true);
 			return true;
 			}
-		// character walking and speed increase snownball
+		// character walking and speed increase snowball
 		if ((characterWalking.getX() + characterWalking.getWidth() - 20) >= (snow_fastArrayImage[i].getX()) &&
 			(characterWalking.getX() + 15) <= (snow_fastArrayImage[i].getX() + snow_fastArrayImage[i].getWidth()) &&
 			(characterWalking.getY() + characterWalking.getHeight()) >= (snow_fastArrayImage[i].getY()) &&
@@ -1128,7 +1128,7 @@ int Hailo::displayTimer(){
 	else{
 		paused = true;
 		return 0;
+	
 		
 	}
-	
 }
