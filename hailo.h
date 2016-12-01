@@ -30,6 +30,9 @@ private:
 
 	TextureManager backgroundTexture;
 	Image   background;
+
+	TextureManager startPageTexture;
+	Image   startPage;
 	
 	TextureManager cloudTexture;
 	Image cloud;
