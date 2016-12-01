@@ -32,6 +32,7 @@ const char HAIL_IMAGE[] = "pictures\\Hail.png";//hail
 const char SNOW_IMAGE[] = "pictures\\snow.png";//snow
 const char FREEZE_IMAGE[] = "pictures\\freeze.png";//freeze
 
+const char FAST_IMAGE[] = "pictures\\fast.png";
 const char MINUS_IMAGE[] = "pictures\\minus.png";//minus
 const char SLOW_IMAGE[] = "pictures\\slow.png";//slow
 const char SNOW_FAST_IMAGE[] = "pictures\\snow_fast.png";//snow_fast
