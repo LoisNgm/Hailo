@@ -96,6 +96,7 @@ void Hailo::update()
 	frozen();
 	
 	jumpingMethod();
+	checkHealth();
 }
 
 //=============================================================================
@@ -176,11 +177,11 @@ void Hailo::render()
 	dxFont.setFontColor(gameNS::FONT_COLOR);
 	// convert score to Cstring
 	
-	_snprintf_s(buffer, BUF_SIZE, "P1\nScore: %d ", (int)p1Score);
+	_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d", (int)p1Health);
 	dxFont.print(buffer, 100, GAME_HEIGHT - 100);
-	//_snprintf_s(buffer, BUF_SIZE, "P2\nScore: %d ", (int)p1Score);
+	//_snprintf_s(buffer, BUF_SIZE, "P2\nScore: %d\n Health: %d");
 	//dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
-
+	
 	graphics->spriteEnd();
 
 
@@ -461,6 +462,7 @@ boolean Hailo::collisionDetection(){
 			(character.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
 
 			p1Score -= rand() % 51 + 50;
+			p1Health--;
 
 			enableKey = false;
 			characterWalking.setVisible(false);
@@ -477,7 +479,7 @@ boolean Hailo::collisionDetection(){
 			(characterWalking.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
 
 			p1Score -= rand() % 51 + 50;
-
+			p1Health--;
 			enableKey = false;
 			characterWalking.setVisible(false);
 			character.setVisible(true);
@@ -883,8 +885,13 @@ int Hailo::displayTimer(){
 		return timer - elapsed_secs;
 	}
 	else{
-		paused = true;
+		cout << "game end" << endl;
 		return 0;
 	}
 
+}
+
+void Hailo::checkHealth(){
+	if (p1Health <= 0)
+		cout << "game end" << endl;
 }

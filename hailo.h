@@ -91,6 +91,8 @@ private:
 	int preventSameColumnSpawning[6];
 	
 	int p1Score;
+	int p1Health = 3;
+
 	clock_t begin = clock();
 	clock_t end;
 	int timer = 60;
@@ -122,6 +124,7 @@ public:
 	void snowAndHailArrayInitialization();
 	int getNonDuplicateRanNum();
 	int displayTimer();
+	void checkHealth();
 };
 
 #endif
