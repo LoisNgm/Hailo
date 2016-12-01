@@ -101,10 +101,12 @@ private:
 	int p1Score;
 	int p1Health = 3;
 
-	clock_t begin = clock();
-	clock_t end;
 	int timer = 60;
 	int elapsed_secs = 0;
+
+	int gameStart = 0;
+	clock_t begin;
+	clock_t end;
 
 public:
     // Constructor
