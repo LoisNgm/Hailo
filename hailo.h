@@ -37,11 +37,13 @@ private:
 	TextureManager hailTexture;
 	Image hail;
 	TextureManager snowTexture;
+	TextureManager fastTexture;
 	Image snow;
 	Image snow_fast;
 	Image snow_invicible;
 	Image snow_minus;
 	Image snow_slow;
+	Image fast;
 	TextureManager snow_fastTexture;
 	TextureManager snow_invincibleTexture;
 	TextureManager snow_minusTexture;
@@ -81,6 +83,12 @@ private:
 	bool stateOfDown = false;
 	int countDownKey = 0;
 	bool freezeState = false;
+	int buffTiming = 5000;
+	int invincibleTime = 0;
+	int buffState = 0;
+	int velocity = 100;
+	int offsetFromChar = 0;
+	bool freezedMoved = false;
 	//arrays
 	Image snowArrayImage[20];
 	Image hailArrayImage[20];
@@ -122,6 +130,7 @@ public:
 	void snowAndHailArrayInitialization();
 	int getNonDuplicateRanNum();
 	int displayTimer();
+	void buffStateCheck();
 };
 
 #endif
