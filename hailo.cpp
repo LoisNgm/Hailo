@@ -1126,3 +1126,17 @@ void Hailo::checkHealth(){
 	if (p1Health <= 0)
 		cout << "game end" << endl;
 }
+int Hailo::displayTimer(){
+	if (timer - elapsed_secs > 0){
+		end = clock();
+		elapsed_secs = int(end - begin) / CLOCKS_PER_SEC;
+		return timer - elapsed_secs;
+		
+	}
+	else{
+		paused = true;
+		return 0;
+		
+	}
+	
+}
