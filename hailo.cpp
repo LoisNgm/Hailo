@@ -551,6 +551,7 @@ boolean Hailo::collisionDetection()
 			buffTiming = 5000;
 			velocity = 100;
 			slow.setVisible(false);
+			fast.setVisible(false);
 			return true;
 		}
 		// character walking and invincible
@@ -566,6 +567,7 @@ boolean Hailo::collisionDetection()
 			buffTiming = 5000;
 			velocity = 100;
 			slow.setVisible(false);
+			fast.setVisible(false);
 			return true;
 		}
 		// character walking and hail
@@ -577,6 +579,7 @@ boolean Hailo::collisionDetection()
 			p1Score -= rand() % 51 + 50;
 			p1Health--;
 			enableKey = false;
+		}
 
 			// character and speed increase snownball
 			if ((character.getX() + character.getWidth() - 20) >= (snow_fastArrayImage[i].getX()) &&
@@ -590,6 +593,8 @@ boolean Hailo::collisionDetection()
 				buffTiming = 5000;
 				buffState = 1;
 				velocity = 200;
+				slow.setVisible(false);
+				fast.setVisible(true);
 				return true;
 			}
 			// character walking and speed increase snownball
@@ -604,9 +609,10 @@ boolean Hailo::collisionDetection()
 				buffTiming = 5000;
 				buffState = 1;
 				velocity = 200;
+				slow.setVisible(false);
+				fast.setVisible(true);
 				return true;
 			}
-		}
 		return false;
 	}
 }
@@ -1066,27 +1072,28 @@ void Hailo::buffStateCheck()
 		{
 			if (invincibleTime <= 2)
 			{
-				/*character.setVisible(false);
-			  characterWalking.setVisible(false);*/	character.setColorFilter(graphicsNS::GREEN);
-			characterWalking.setColorFilter(graphicsNS::GREEN);
-			//character.se
+				character.setVisible(false);
+				characterWalking.setVisible(false);
+
 			}
 			else
 			{
-				/*	if (input->isKeyDown(VK_UP) || input->isKeyDown(VK_LEFT) || input->isKeyDown(VK_RIGHT))
-						characterWalking.setVisible(true);
-						else
-						character.setVisible(true);*/
-				character.setColorFilter(graphicsNS::BLACK);
-				characterWalking.setColorFilter(graphicsNS::BLACK);
+				if (input->isKeyDown(VK_UP) || input->isKeyDown(VK_LEFT) || input->isKeyDown(VK_RIGHT))
+					characterWalking.setVisible(true);
+				else
+					character.setVisible(true);
 			}
-			if (invincibleTime >= 400)
+			if (invincibleTime >= 4)
 				invincibleTime = 0;
 			buffTiming--;
 			invincibleTime++;
 		}
 		else
 		{
+			if (input->isKeyDown(VK_UP) || input->isKeyDown(VK_LEFT) || input->isKeyDown(VK_RIGHT))
+				characterWalking.setVisible(true);
+			else
+				character.setVisible(true);
 			buffState = 0;
 			invincibleTime = 1000;
 		}
