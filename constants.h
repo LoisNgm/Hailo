@@ -68,6 +68,7 @@ const UCHAR ENTER_KEY    = VK_RETURN;   // Enter key
 const int FLOOR = 585;
 const int SNOW_ROTATION_RATE = 5;
 const int SPAWNTIME = 2;
+const int BUFFTIME = 1;
 const float SNOW_SPEED = 100.00f;
 
 //character variable

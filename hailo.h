@@ -83,12 +83,15 @@ private:
 	bool stateOfDown = false;
 	int countDownKey = 0;
 	bool freezeState = false;
-	int buffTiming = 5000;
+	int buffTiming = 5;
 	int invincibleTime = 0;
 	int buffState = 0;
 	int velocity = 100;
 	int offsetFromChar = 0;
 	bool freezedMoved = false;
+	float buffForEffectTime = 0;
+
+
 	//arrays
 	Image snowArrayImage[20];
 	Image hailArrayImage[20];
