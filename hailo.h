@@ -75,10 +75,9 @@ private:
 	float lastsnow_invincibleSpawnTime = 0;
 	float lastsnow_minusSpawnTime = 0;
 	float lastsnow_slowSpawnTime = 0;
-
+	float unfreezeTimer = 0;
 
 	int JumpTimer = 0;
-	int unFreezeTimer = 0;
 	bool jumping = false;
 	bool increasingYAxisJump = true;
 	bool enableKey = true;
@@ -86,12 +85,15 @@ private:
 	bool stateOfDown = false;
 	int countDownKey = 0;
 	bool freezeState = false;
-	int buffTiming = 5000;
+	int buffTiming = 5;
 	int invincibleTime = 0;
 	int buffState = 0;
 	int velocity = 100;
 	int offsetFromChar = 0;
 	bool freezedMoved = false;
+	float buffForEffectTime = 0;
+
+
 	//arrays
 	Image snowArrayImage[20];
 	Image hailArrayImage[20];
