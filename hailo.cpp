@@ -136,69 +136,75 @@ void Hailo::collisions()
 void Hailo::render()
 {
 	graphics->spriteBegin();                // begin drawing sprites
-	background.draw();
-	
-	snow.draw();
-	hail.draw();
-	cloud.draw();
-	snow_fast.draw();
-	snow_invicible.draw();
-	snowman.draw();
-	snowman_head.draw();
-	snow_minus.draw();
-	snow_slow.draw();
+	if (gameStart == 0){
+		startPage.draw();
+		if (input->anyKeyPressed()){
+			begin = clock();
+			gameStart = 1;
+			paused = false;
+		}
+	}
+	else if (gameStart == 1){
+		background.draw();
 
-	for (int i = 0; i < (sizeof(snowArrayImage) / sizeof(Image)); i++)
-	{
-		snowArrayImage[i].draw();
+		snow.draw();
+		hail.draw();
+		cloud.draw();
+		snow_fast.draw();
+		snow_invicible.draw();
+		snowman.draw();
+		snowman_head.draw();
+		snow_minus.draw();
+		snow_slow.draw();
+		for (int i = 0; i < (sizeof(snowArrayImage) / sizeof(Image)); i++)
+		{
+			snowArrayImage[i].draw();
+		}
+		for (int i = 0; i < (sizeof(hailArrayImage) / sizeof(Image)); i++)
+		{
+			hailArrayImage[i].draw();
+		}
+		for (int i = 0; i < (sizeof(snow_fastArrayImage) / sizeof(Image)); i++)
+		{
+			snow_fastArrayImage[i].draw();
+		}
+		for (int i = 0; i < (sizeof(snow_invincibleArrayImage) / sizeof(Image)); i++)
+		{
+			snow_invincibleArrayImage[i].draw();
+		}
+		for (int i = 0; i < (sizeof(snow_minusArrayImage) / sizeof(Image)); i++)
+		{
+			snow_minusArrayImage[i].draw();
+		}
+		for (int i = 0; i < (sizeof(snow_slowArrayImage) / sizeof(Image)); i++)
+		{
+			snow_slowArrayImage[i].draw();
+		}
+		character.draw();
+		characterWalking.draw();
+		freeze.draw();
+		minus.draw();
+		slow.draw();
+		fast.draw();
+		const int BUF_SIZE = 20;
+		static char buffer[BUF_SIZE];
+
+		//dxFontSmall->setFontColor(graphicsNS::BLACK);
+		//dxFontMedium->setFontColor(graphicsNS::BLACK);
+		dxFontMedium->setFontColor(graphicsNS::WHITE);
+		dxFontMedium->print(to_string(displayTimer()), 500, GAME_HEIGHT - 100);
+		//dxFontLarge->print("C", 20, 100);
+		//dxFontMedium->print("C", 114, 148);
+		//dxFontSmall->print("C", 164, 184);
+		dxFont.setFontColor(gameNS::FONT_COLOR);
+		// convert score to Cstring
+
+		_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d", (int)p1Health);
+		dxFont.print(buffer, 100, GAME_HEIGHT - 100);
+		//_snprintf_s(buffer, BUF_SIZE, "P2\nScore: %d\n Health: %d");
+		//dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 	}
-	for (int i = 0; i < (sizeof(hailArrayImage) / sizeof(Image)); i++)
-	{
-		hailArrayImage[i].draw();
-	}
-	for (int i = 0; i < (sizeof(snow_fastArrayImage) / sizeof(Image)); i++)
-	{
-		snow_fastArrayImage[i].draw();
-	}
-	for (int i = 0; i < (sizeof(snow_invincibleArrayImage) / sizeof(Image)); i++)
-	{
-		snow_invincibleArrayImage[i].draw();
-	}
-	for (int i = 0; i < (sizeof(snow_minusArrayImage) / sizeof(Image)); i++)
-	{
-		snow_minusArrayImage[i].draw();
-	}
-	for (int i = 0; i < (sizeof(snow_slowArrayImage) / sizeof(Image)); i++)
-	{
-		snow_slowArrayImage[i].draw();
-	}
-	character.draw();
-	characterWalking.draw();
-	freeze.draw();
-	minus.draw();
-	slow.draw();
-	fast.draw();
-	const int BUF_SIZE = 20;
-	static char buffer[BUF_SIZE];
-	
-	//dxFontSmall->setFontColor(graphicsNS::BLACK);
-	//dxFontMedium->setFontColor(graphicsNS::BLACK);
-	dxFontMedium->setFontColor(graphicsNS::WHITE);
-	dxFontMedium->print(to_string(displayTimer()), 500, GAME_HEIGHT - 100);
-	//dxFontLarge->print("C", 20, 100);
-	//dxFontMedium->print("C", 114, 148);
-	//dxFontSmall->print("C", 164, 184);
-	dxFont.setFontColor(gameNS::FONT_COLOR);
-	// convert score to Cstring
-	
-	_snprintf_s(buffer, BUF_SIZE, "P1\nScore: %d", (int)p1Score);
-	dxFont.print(buffer, 100, GAME_HEIGHT - 100);
-	//_snprintf_s(buffer, BUF_SIZE, "P2\nScore: %d\n Health: %d");
-	//dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
-	
 	graphics->spriteEnd();
-
-
 }
 
 //=============================================================================
@@ -222,6 +228,7 @@ void Hailo::releaseAll()
 	snowman_headTexture.onLostDevice();
 	snow_minusTexture.onLostDevice();
 	snow_slowTexture.onLostDevice();
+	startPageTexture.onLostDevice();
 	fastTexture.onLostDevice();
     Game::releaseAll();
     return;
@@ -248,6 +255,7 @@ void Hailo::resetAll()
 	snowman_headTexture.onResetDevice();
 	snow_minusTexture.onResetDevice();
 	snow_slowTexture.onResetDevice();
+	startPageTexture.onResetDevice();
 	fastTexture.onResetDevice();
     Game::resetAll();
     return;
@@ -825,15 +833,14 @@ void Hailo::unfreeze()
 		stateOfDown = false;
 		stateOfUp = false;
 		countDownKey++;
-		unFreezeTimer += 100;//to unfreeze faster	
+		unfreezeTimer -= 0.1;
 	}
-
-	unFreezeTimer++;
-	if (countDownKey >= 20 || unFreezeTimer >= 2000)//around 10 seconds or key was pressed and released 20 or more times
+	cout << gameTime - unfreezeTimer << endl;
+	if (countDownKey >= 20 || (gameTime-unfreezeTimer)>=FREEZETIME)//around 10 seconds or key was pressed and released 20 or more times
 	{
 		enableKey = true;
 		countDownKey = 0;
-		unFreezeTimer = 0;
+		unfreezeTimer = gameTime;
 		freezeState = false;
 		freezedMoved = false;
 		offsetFromChar = 0;
@@ -843,6 +850,13 @@ void Hailo::unfreeze()
 }
 void Hailo::importImage()
 {
+	// start page texture
+	if (!startPageTexture.initialize(graphics, START_PAGE_IMAGE))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing start page texture"));
+
+	// start page
+	if (!startPage.initialize(graphics, 0, 0, 0, &startPageTexture))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 	//character type Image
 
 	// characterWalking texture
@@ -993,6 +1007,7 @@ void Hailo::importImage()
 	// fast
 	if (!fast.initialize(graphics, 0, 0, 0, &fastTexture))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
+
 }
 
 void Hailo::snowAndHailArrayInitialization()
@@ -1178,12 +1193,9 @@ int Hailo::displayTimer(){
 		end = clock();
 		elapsed_secs = int(end - begin) / CLOCKS_PER_SEC;
 		return timer - elapsed_secs;
-		
 	}
 	else{
 		paused = true;
 		return 0;
-	
-		
 	}
 }

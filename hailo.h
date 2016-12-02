@@ -30,6 +30,9 @@ private:
 
 	TextureManager backgroundTexture;
 	Image   background;
+
+	TextureManager startPageTexture;
+	Image   startPage;
 	
 	TextureManager cloudTexture;
 	Image cloud;
@@ -72,10 +75,9 @@ private:
 	float lastsnow_invincibleSpawnTime = 0;
 	float lastsnow_minusSpawnTime = 0;
 	float lastsnow_slowSpawnTime = 0;
-
+	float unfreezeTimer = 0;
 
 	int JumpTimer = 0;
-	int unFreezeTimer = 0;
 	bool jumping = false;
 	bool increasingYAxisJump = true;
 	bool enableKey = true;
@@ -104,10 +106,12 @@ private:
 	int p1Score;
 	int p1Health = 3;
 
-	clock_t begin = clock();
-	clock_t end;
 	int timer = 60;
 	int elapsed_secs = 0;
+
+	int gameStart = 0;
+	clock_t begin;
+	clock_t end;
 
 public:
     // Constructor
