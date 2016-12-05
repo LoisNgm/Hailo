@@ -54,7 +54,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     try{
         game->initialize(hwnd);     // throws GameError
-
         // main message loop
         int done = 0;
         while (!done)

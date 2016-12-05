@@ -2,6 +2,7 @@
 #include "hailo.h"
 #include <iostream>
 #include <time.h> 
+
 using namespace std;
 
 //=============================================================================
@@ -34,14 +35,13 @@ void Hailo::initialize(HWND hwnd)
 	importImage();
 	snowAndHailArrayInitialization();
 	
-
 	//snowman
 	snowman.setX(GAME_WIDTH / 2 - snowman.getWidth()/2);
 	snowman.setY(GAME_HEIGHT - snowman.getHeight() - 160.0f);
 	snowman.setCurrentFrame(SNOWMAN_START_FRAME);
 	snowman.setFrames(SNOWMAN_START_FRAME, SNOWMAN_END_FRAME);
 	snowman.setFrameDelay(SNOWMAN_ANIMATION_DELAY);
-	freeze.setVisible(false);
+	
 
 	//characters
 	snow.setY(30);
@@ -61,8 +61,9 @@ void Hailo::initialize(HWND hwnd)
 	hail.setVisible(false);
 	
 
-	freeze.setVisible(false);
-
+	freeze[0].setVisible(false);
+	freeze[1].setVisible(false);
+	//Character player 1
 	character.setY(GAME_HEIGHT - character.getHeight() - 160.0f);
 	characterWalking.setY(GAME_HEIGHT - character.getHeight() - 160.0f);
 	characterWalking.setCurrentFrame(CHARACTERWALKING_START_FRAME);
@@ -71,6 +72,16 @@ void Hailo::initialize(HWND hwnd)
 	characterWalking.setVisible(false);
 	character.setVisible(true);
 	
+	//Character player 2
+	character2.setY(GAME_HEIGHT - character2.getHeight() - 160.0f);
+	characterWalking2.setY(GAME_HEIGHT - character2.getHeight() - 160.0f);
+	characterWalking2.setCurrentFrame(CHARACTERWALKING_START_FRAME);
+	characterWalking2.setFrames(CHARACTERWALKING_START_FRAME, CHARACTERWALKING_END_FRAME);
+	characterWalking2.setFrameDelay(CHARACTERWALKING_ANIMATION_DELAY);
+	characterWalking2.setVisible(false);
+	character2.setVisible(true);
+
+
 	// 15 pixel high Arial
 	if (dxFontSmall->initialize(graphics, 15, true, false, "Arial") == false)
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing DirectX font"));
@@ -88,7 +99,6 @@ void Hailo::initialize(HWND hwnd)
 	
     return;
 }
-int counting = 0;
 //=============================================================================
 // Update all game items
 //=============================================================================
@@ -97,7 +107,14 @@ void Hailo::update()
 	itemSpawn();
 	//cloud's animation....
 	cloudAnimation();
-
+	characterWalking.update(frameTime);
+	characterWalking2.update(frameTime);
+	snowman.update(frameTime);
+	buffStateCheck(character, characterWalking, 1);
+	buffStateCheck(character2, characterWalking2, 2);
+	jumpingMethod();
+	jumpingMethod2();
+	checkHealth();
 	//if else to prevent keyDown when freezing characters
 	if (enableKey)
 	{
@@ -105,13 +122,19 @@ void Hailo::update()
 	}
 	else
 	{
-		frozen();
+		frozen(character,characterWalking,1);
 	}
-	characterWalking.update(frameTime);
-	snowman.update(frameTime);
-	buffStateCheck();
-	jumpingMethod();
-	checkHealth();
+	
+	if (enableKey2)
+	{
+		characterControl2();
+	}
+	else
+	{
+		frozen(character2,characterWalking2, 2);
+	}
+
+	
 }
 
 //=============================================================================
@@ -127,7 +150,8 @@ void Hailo::ai()
 //=============================================================================
 void Hailo::collisions()
 {
-	collisionDetection();
+	collisionDetection(character,characterWalking,1);
+	collisionDetection(character2, characterWalking2,2);
 }
 
 //=============================================================================
@@ -182,10 +206,16 @@ void Hailo::render()
 		}
 		character.draw();
 		characterWalking.draw();
-		freeze.draw();
-		minus.draw();
-		slow.draw();
-		fast.draw();
+		character2.draw();
+		characterWalking2.draw();
+		freeze[0].draw();
+		minus[0].draw();
+		slow[0].draw();
+		fast[0].draw();
+		freeze[1].draw();
+		minus[1].draw();
+		slow[1].draw();
+		fast[1].draw();
 		const int BUF_SIZE = 20;
 		static char buffer[BUF_SIZE];
 
@@ -249,6 +279,7 @@ void Hailo::resetAll()
 	freezeTexture.onResetDevice();
 	minusTexture.onResetDevice();
 	slowTexture.onResetDevice();
+	fastTexture.onResetDevice();
 	snow_fastTexture.onResetDevice();
 	snow_invincibleTexture.onResetDevice();
 	snowmanTexture.onResetDevice();
@@ -256,8 +287,7 @@ void Hailo::resetAll()
 	snow_minusTexture.onResetDevice();
 	snow_slowTexture.onResetDevice();
 	startPageTexture.onResetDevice();
-	fastTexture.onResetDevice();
-    Game::resetAll();
+	Game::resetAll();
     return;
 }
 //spawning hail and snow
@@ -432,33 +462,41 @@ void Hailo::itemSpawn()
 		preventSameColumnSpawning[i] = 0;
 	}
 }
-boolean Hailo::collisionDetection()
+boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 {
 	for (int i = 0; i < (sizeof(snowArrayImage) / sizeof(Image)); i++){
-		// character and snow
-		if ((character.getX() + character.getWidth() - 20) >= (snowArrayImage[i].getX()) &&
-			(character.getX() + 15) <= (snowArrayImage[i].getX() + snowArrayImage[i].getWidth()) &&
-			(character.getY() + character.getHeight()) >= (snowArrayImage[i].getY()) &&
-			(character.getY() + 10) <= (snowArrayImage[i].getY() + snowArrayImage[i].getHeight())){
-			if (buffState==4 )
+		// c and snow
+		if ((c.getX() + c.getWidth() - 20) >= (snowArrayImage[i].getX()) &&
+			(c.getX() + 15) <= (snowArrayImage[i].getX() + snowArrayImage[i].getWidth()) &&
+			(c.getY() + c.getHeight()) >= (snowArrayImage[i].getY()) &&
+			(c.getY() + 10) <= (snowArrayImage[i].getY() + snowArrayImage[i].getHeight())){
+			if (buffState == 4)
 			{
 				p1Score -= (rand() % 100 + 1);
 			}
 			else
 			{
 				p1Score += (rand() % 100 + 1);
+			}
+			if (buffState2 == 4)
+			{
+				p2Score -= (rand() % 100 + 1);
+			}
+			else
+			{
+				p2Score += (rand() % 100 + 1);
+			}
 
-			}
 			snowArrayImage[i].setY(30);//reset snow position
 			snowArrayImage[i].setVisible(false);//reuse snow object.
 			return true;
 		}
-		// character walking and snow
-		if ((characterWalking.getX() + characterWalking.getWidth() - 20) >= (snowArrayImage[i].getX()) &&
-			(characterWalking.getX() + 15) <= (snowArrayImage[i].getX() + snowArrayImage[i].getWidth()) &&
-			(characterWalking.getY() + characterWalking.getHeight()) >= (snowArrayImage[i].getY()) &&
-			(characterWalking.getY() + 10) <= (snowArrayImage[i].getY() + snowArrayImage[i].getHeight())){
-			if (buffState ==4)
+		// c walking and snow
+		if ((cw.getX() + cw.getWidth() - 20) >= (snowArrayImage[i].getX()) &&
+			(cw.getX() + 15) <= (snowArrayImage[i].getX() + snowArrayImage[i].getWidth()) &&
+			(cw.getY() + cw.getHeight()) >= (snowArrayImage[i].getY()) &&
+			(cw.getY() + 10) <= (snowArrayImage[i].getY() + snowArrayImage[i].getHeight())){
+			if (buffState == 4)
 			{
 				p1Score -= (rand() % 100 + 1);
 			}
@@ -466,189 +504,365 @@ boolean Hailo::collisionDetection()
 			{
 				p1Score += (rand() % 100 + 1);
 			}
+			if (buffState2 == 4)
+			{
+				p2Score -= (rand() % 100 + 1);
+			}
+			else
+			{
+				p2Score += (rand() % 100 + 1);
+			}
 			snowArrayImage[i].setY(30);//reset snow position
 			snowArrayImage[i].setVisible(false);//reuse snow object.
 			return true;
 		}
-		if (buffState != 2)
+		if (buffState != 2&& playerNum==1) 		
 		{
-			// character and hail
-			if ((character.getX() + character.getWidth() - 20) >= (hailArrayImage[i].getX()) &&
-				(character.getX() + 15) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
-				(character.getY() + character.getHeight()) >= (hailArrayImage[i].getY()) &&
-				(character.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
-				p1Score -= rand() % 51 + 50;
-				p1Health--;
-				enableKey = false;
-				characterWalking.setVisible(false);
-				character.setVisible(true);
-				freezeState = true;
+			// c and hail
+			if ((c.getX() + c.getWidth() - 20) >= (hailArrayImage[i].getX()) &&
+				(c.getX() + 15) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
+				(c.getY() + c.getHeight()) >= (hailArrayImage[i].getY()) &&
+				(c.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
+					p1Score -= rand() % 51 + 50;
+					p1Health--;
+					enableKey = false;
+					freezeState = true;				
 				hailArrayImage[i].setY(30);//reset hail position
 				hailArrayImage[i].setVisible(false);//reuse hail object.
 				return true;
 			}
-			// character walking and hail
-			if ((characterWalking.getX() + characterWalking.getWidth() - 20) >= (hailArrayImage[i].getX()) &&
-				(characterWalking.getX() + 15) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
-				(characterWalking.getY() + characterWalking.getHeight()) >= (hailArrayImage[i].getY()) &&
-				(characterWalking.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
-				p1Score -= rand() % 51 + 50;
-				p1Health--;
-				enableKey = false;
-				characterWalking.setVisible(false);
-				character.setVisible(true);
-				freezeState = true;
+			// c walking and hail
+			if ((cw.getX() + cw.getWidth() - 20) >= (hailArrayImage[i].getX()) &&
+				(cw.getX() + 15) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
+				(cw.getY() + cw.getHeight()) >= (hailArrayImage[i].getY()) &&
+				(cw.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
+				if (playerNum == 1)
+				{
+					p1Score -= rand() % 51 + 50;
+					p1Health--;
+					enableKey = false;
+					freezeState = true;
+					cw.setVisible(false);
+					c.setVisible(true);
+				}
 				hailArrayImage[i].setY(30);//reset hail position
 				hailArrayImage[i].setVisible(false);//reuse hail object.
 				return true;
 			}
 			//Colliding with downgrades
-			//Character and slow speed snow
-			if ((character.getX() + character.getWidth() - 20) >= (snow_slowArrayImage[i].getX()) &&
-				(character.getX() + 15) <= (snow_slowArrayImage[i].getX() + snow_slowArrayImage[i].getWidth()) &&
-				(character.getY() + character.getHeight()) >= (snow_slowArrayImage[i].getY()) &&
-				(character.getY() + 10) <= (snow_slowArrayImage[i].getY() + snow_slowArrayImage[i].getHeight()))
+			//c and slow speed snow
+			if ((c.getX() + c.getWidth() - 20) >= (snow_slowArrayImage[i].getX()) &&
+				(c.getX() + 15) <= (snow_slowArrayImage[i].getX() + snow_slowArrayImage[i].getWidth()) &&
+				(c.getY() + c.getHeight()) >= (snow_slowArrayImage[i].getY()) &&
+				(c.getY() + 10) <= (snow_slowArrayImage[i].getY() + snow_slowArrayImage[i].getHeight()))
 			{
-				characterWalking.setVisible(false);
-				character.setVisible(true);
+				cw.setVisible(false);
+				c.setVisible(true);
 				snow_slowArrayImage[i].setY(30);
 				snow_slowArrayImage[i].setVisible(false);
-				buffTiming = 5000;
-				buffState = 3;
-				velocity = 50;
-				fast.setVisible(false);
-				minus.setVisible(false);
-				buffTiming = 5;
+				if (playerNum == 1)
+				{
+					buffTiming = 5000;
+					buffState = 3;
+					velocity = 50;
+					buffTiming = 5;
+				}
+				fast[playerNum - 1].setVisible(false);
+				minus[playerNum-1].setVisible(false);
+				cw.setVisible(false);
+				c.setVisible(true);
+			
 				return true;
 			}
-			// character walking and slow speed snow 
-			if ((characterWalking.getX() + characterWalking.getWidth() - 20) >= (snow_slowArrayImage[i].getX()) &&
-				(characterWalking.getX() + 15) <= (snow_slowArrayImage[i].getX() + snow_slowArrayImage[i].getWidth()) &&
-				(characterWalking.getY() + characterWalking.getHeight()) >= (snow_slowArrayImage[i].getY()) &&
-				(characterWalking.getY() + 10) <= (snow_slowArrayImage[i].getY() + snow_slowArrayImage[i].getHeight())){
-				characterWalking.setVisible(false);
-				character.setVisible(true);
+			// c walking and slow speed snow 
+			if ((cw.getX() + cw.getWidth() - 20) >= (snow_slowArrayImage[i].getX()) &&
+				(cw.getX() + 15) <= (snow_slowArrayImage[i].getX() + snow_slowArrayImage[i].getWidth()) &&
+				(cw.getY() + cw.getHeight()) >= (snow_slowArrayImage[i].getY()) &&
+				(cw.getY() + 10) <= (snow_slowArrayImage[i].getY() + snow_slowArrayImage[i].getHeight())){
+
+				if (playerNum == 1)
+				{
+					buffTiming = 5000;
+					buffState = 3;
+					velocity = 50;
+					buffTiming = 5;
+				}
+				cw.setVisible(false);
+				c.setVisible(true);
 				snow_slowArrayImage[i].setY(30);
 				snow_slowArrayImage[i].setVisible(false);
-				buffTiming = 5000;
-				fast.setVisible(false);
-				minus.setVisible(false);
-				buffState = 3;
-				velocity = 50;
-				buffTiming = 5;
+				fast[playerNum - 1].setVisible(false);
+				minus[playerNum-1].setVisible(false);
 				return true;
 			}
 
 			//Colliding with downgrades
-			//Character and minus snowball
-			if ((character.getX() + character.getWidth() - 20) >= (snow_minusArrayImage[i].getX()) &&
-				(character.getX() + 15) <= (snow_minusArrayImage[i].getX() + snow_minusArrayImage[i].getWidth()) &&
-				(character.getY() + character.getHeight()) >= (snow_minusArrayImage[i].getY()) &&
-				(character.getY() + 10) <= (snow_minusArrayImage[i].getY() + snow_minusArrayImage[i].getHeight())){
-				characterWalking.setVisible(false);
-				character.setVisible(true);
+			//c and minus snowball
+			if ((c.getX() + c.getWidth() - 20) >= (snow_minusArrayImage[i].getX()) &&
+				(c.getX() + 15) <= (snow_minusArrayImage[i].getX() + snow_minusArrayImage[i].getWidth()) &&
+				(c.getY() + c.getHeight()) >= (snow_minusArrayImage[i].getY()) &&
+				(c.getY() + 10) <= (snow_minusArrayImage[i].getY() + snow_minusArrayImage[i].getHeight())){
+				cw.setVisible(false);
+				c.setVisible(true);
 				snow_minusArrayImage[i].setY(30);
 				snow_minusArrayImage[i].setVisible(false);
-				slow.setVisible(false);
-				fast.setVisible(false);
-				minus.setVisible(true);
-				buffState = 4;
-				buffTiming = 5;
+				slow[playerNum - 1].setVisible(false);
+				fast[playerNum - 1].setVisible(false);
+				minus[playerNum - 1].setVisible(true);
+				if (playerNum == 1)
+				{
+					buffState = 4;
+					buffTiming = 5;
+				}
 				return true;
 			}
-			// character walking and minus snowball
-			if ((characterWalking.getX() + characterWalking.getWidth() - 20) >= (snow_minusArrayImage[i].getX()) &&
-				(characterWalking.getX() + 15) <= (snow_minusArrayImage[i].getX() + snow_minusArrayImage[i].getWidth()) &&
-				(characterWalking.getY() + characterWalking.getHeight()) >= (snow_minusArrayImage[i].getY()) &&
-				(characterWalking.getY() + 10) <= (snow_minusArrayImage[i].getY() + snow_minusArrayImage[i].getHeight())){
-				characterWalking.setVisible(false);
-				character.setVisible(true);
+			// c walking and minus snowball
+			if ((cw.getX() + cw.getWidth() - 20) >= (snow_minusArrayImage[i].getX()) &&
+				(cw.getX() + 15) <= (snow_minusArrayImage[i].getX() + snow_minusArrayImage[i].getWidth()) &&
+				(cw.getY() + cw.getHeight()) >= (snow_minusArrayImage[i].getY()) &&
+				(cw.getY() + 10) <= (snow_minusArrayImage[i].getY() + snow_minusArrayImage[i].getHeight())){
+				cw.setVisible(false);
+				c.setVisible(true);
 				snow_minusArrayImage[i].setY(30);
 				snow_minusArrayImage[i].setVisible(false);
-				slow.setVisible(false);
-				fast.setVisible(false);
-				minus.setVisible(true);
-				buffState = 4;
-				buffTiming = 5;
+				slow[playerNum - 1].setVisible(false);
+				fast[playerNum - 1].setVisible(false);
+				minus[playerNum - 1].setVisible(true);
+				if (playerNum == 1)
+				{
+					buffState = 4;
+					buffTiming = 5;
+				}
+				return true;
+			}
+		}
+		if (buffState2 != 2 && playerNum==2)
+		{
+			// c and hail
+			if ((c.getX() + c.getWidth() - 20) >= (hailArrayImage[i].getX()) &&
+				(c.getX() + 15) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
+				(c.getY() + c.getHeight()) >= (hailArrayImage[i].getY()) &&
+				(c.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){		
+					p2Score -= rand() % 51 + 50;
+					p2Health--;
+					enableKey2 = false;
+					freezeState2 = true;
+					cw.setVisible(false);
+					c.setVisible(true);
+				
+				hailArrayImage[i].setY(30);//reset hail position
+				hailArrayImage[i].setVisible(false);//reuse hail object.
+				return true;
+			}
+			// c walking and hail
+			if ((cw.getX() + cw.getWidth() - 20) >= (hailArrayImage[i].getX()) &&
+				(cw.getX() + 15) <= (hailArrayImage[i].getX() + hailArrayImage[i].getWidth()) &&
+				(cw.getY() + cw.getHeight()) >= (hailArrayImage[i].getY()) &&
+				(cw.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
+					p2Score -= rand() % 51 + 50;
+					p2Health--;
+					enableKey2 = false;
+					freezeState2 = true;
+					cw.setVisible(false);
+					c.setVisible(true);
+				
+				hailArrayImage[i].setY(30);//reset hail position
+				hailArrayImage[i].setVisible(false);//reuse hail object.
+				return true;
+			}
+			//Colliding with downgrades
+			//c and slow speed snow
+			if ((c.getX() + c.getWidth() - 20) >= (snow_slowArrayImage[i].getX()) &&
+				(c.getX() + 15) <= (snow_slowArrayImage[i].getX() + snow_slowArrayImage[i].getWidth()) &&
+				(c.getY() + c.getHeight()) >= (snow_slowArrayImage[i].getY()) &&
+				(c.getY() + 10) <= (snow_slowArrayImage[i].getY() + snow_slowArrayImage[i].getHeight()))
+			{
+				cw.setVisible(false);
+				c.setVisible(true);
+				snow_slowArrayImage[i].setY(30);
+				snow_slowArrayImage[i].setVisible(false);
+				
+					buffTiming2 = 5000;
+					buffState2 = 3;
+					velocity2 = 50;
+					buffTiming = 5;
+			
+				fast[playerNum - 1].setVisible(false);
+				minus[playerNum - 1].setVisible(false);
+				cw.setVisible(false);
+				c.setVisible(true);
+
+				return true;
+			}
+			// c walking and slow speed snow 
+			if ((cw.getX() + cw.getWidth() - 20) >= (snow_slowArrayImage[i].getX()) &&
+				(cw.getX() + 15) <= (snow_slowArrayImage[i].getX() + snow_slowArrayImage[i].getWidth()) &&
+				(cw.getY() + cw.getHeight()) >= (snow_slowArrayImage[i].getY()) &&
+				(cw.getY() + 10) <= (snow_slowArrayImage[i].getY() + snow_slowArrayImage[i].getHeight())){			
+					buffTiming2 = 5000;
+					buffState2 = 3;
+					velocity2 = 50;
+					buffTiming = 5;				
+				cw.setVisible(false);
+				c.setVisible(true);
+				snow_slowArrayImage[i].setY(30);
+				snow_slowArrayImage[i].setVisible(false);
+				fast[playerNum - 1].setVisible(false);
+				minus[playerNum - 1].setVisible(false);
+				return true;
+			}
+
+			//Colliding with downgrades
+			//c and minus snowball
+			if ((c.getX() + c.getWidth() - 20) >= (snow_minusArrayImage[i].getX()) &&
+				(c.getX() + 15) <= (snow_minusArrayImage[i].getX() + snow_minusArrayImage[i].getWidth()) &&
+				(c.getY() + c.getHeight()) >= (snow_minusArrayImage[i].getY()) &&
+				(c.getY() + 10) <= (snow_minusArrayImage[i].getY() + snow_minusArrayImage[i].getHeight())){
+				cw.setVisible(false);
+				c.setVisible(true);
+				snow_minusArrayImage[i].setY(30);
+				snow_minusArrayImage[i].setVisible(false);
+				slow[playerNum - 1].setVisible(false);
+				fast[playerNum - 1].setVisible(false);
+				minus[playerNum - 1].setVisible(true);				
+				buffState2 = 4;
+				buffTiming2 = 5;				
+				return true;
+			}
+			// c walking and minus snowball
+			if ((cw.getX() + cw.getWidth() - 20) >= (snow_minusArrayImage[i].getX()) &&
+				(cw.getX() + 15) <= (snow_minusArrayImage[i].getX() + snow_minusArrayImage[i].getWidth()) &&
+				(cw.getY() + cw.getHeight()) >= (snow_minusArrayImage[i].getY()) &&
+				(cw.getY() + 10) <= (snow_minusArrayImage[i].getY() + snow_minusArrayImage[i].getHeight())){
+				cw.setVisible(false);
+				c.setVisible(true);
+				snow_minusArrayImage[i].setY(30);
+				snow_minusArrayImage[i].setVisible(false);
+				slow[playerNum - 1].setVisible(false);
+				fast[playerNum - 1].setVisible(false);
+				minus[playerNum - 1].setVisible(true);			
+				buffState2 = 4;
+				buffTiming2 = 5;				
 				return true;
 			}
 		}
 		//Colliding with Upgrades
-		//character and invincible snow
-		if ((character.getX() + character.getWidth() - 20) >= (snow_invincibleArrayImage[i].getX()) &&
-			(character.getX() + 15) <= (snow_invincibleArrayImage[i].getX() + snow_invincibleArrayImage[i].getWidth()) &&
-			(character.getY() + character.getHeight()) >= (snow_invincibleArrayImage[i].getY()) &&
-			(character.getY() + 10) <= (snow_invincibleArrayImage[i].getY() + snow_invincibleArrayImage[i].getHeight())){
-			characterWalking.setVisible(false);
-			character.setVisible(true);
+		//c and invincible snow
+		if ((c.getX() + c.getWidth() - 20) >= (snow_invincibleArrayImage[i].getX()) &&
+			(c.getX() + 15) <= (snow_invincibleArrayImage[i].getX() + snow_invincibleArrayImage[i].getWidth()) &&
+			(c.getY() + c.getHeight()) >= (snow_invincibleArrayImage[i].getY()) &&
+			(c.getY() + 10) <= (snow_invincibleArrayImage[i].getY() + snow_invincibleArrayImage[i].getHeight())){
+			cw.setVisible(false);
+			c.setVisible(true);
 			snow_invincibleArrayImage[i].setY(30);//reset invincible position
 			snow_invincibleArrayImage[i].setVisible(false);//reuse invincible object.
-			buffState = 2;
-			buffTiming = 5000;
-			velocity = 100;
-			slow.setVisible(false);
-			fast.setVisible(false);
-			minus.setVisible(false);
-			buffTiming = 5;
+			if (playerNum==1)
+			{
+				buffState = 2;
+				buffTiming = 5000;
+				velocity = 100;
+				buffTiming = 5;
+			}
+			else
+			{
+				buffState2 = 2;
+				buffTiming2 = 5000;
+				velocity2 = 100;
+				buffTiming2 = 5;
+			}
+			slow[playerNum - 1].setVisible(false);
+			fast[playerNum - 1].setVisible(false);
+			minus[playerNum - 1].setVisible(false);
 			return true;
 		}
-		// character walking and invincible
-		if ((characterWalking.getX() + characterWalking.getWidth() - 20) >= (snow_invincibleArrayImage[i].getX()) &&
-			(characterWalking.getX() + 15) <= (snow_invincibleArrayImage[i].getX() + snow_invincibleArrayImage[i].getWidth()) &&
-			(characterWalking.getY() + characterWalking.getHeight()) >= (snow_invincibleArrayImage[i].getY()) &&
-			(characterWalking.getY() + 10) <= (snow_invincibleArrayImage[i].getY() + snow_invincibleArrayImage[i].getHeight())){
-			characterWalking.setVisible(false);
-			character.setVisible(true);
+		// c walking and invincible
+		if ((cw.getX() + cw.getWidth() - 20) >= (snow_invincibleArrayImage[i].getX()) &&
+			(cw.getX() + 15) <= (snow_invincibleArrayImage[i].getX() + snow_invincibleArrayImage[i].getWidth()) &&
+			(cw.getY() + cw.getHeight()) >= (snow_invincibleArrayImage[i].getY()) &&
+			(cw.getY() + 10) <= (snow_invincibleArrayImage[i].getY() + snow_invincibleArrayImage[i].getHeight())){
+			cw.setVisible(false);
+			c.setVisible(true);
+			if (playerNum == 1)
+			{
+				buffState = 2;
+				buffTiming = 5000;
+				velocity = 100;
+				buffTiming = 5;
+			}
+			else
+			{
+				buffState2 = 2;
+				buffTiming2 = 5000;
+				velocity2 = 100;
+				buffTiming2 = 5;
+			}
 			snow_invincibleArrayImage[i].setY(30);
 			snow_invincibleArrayImage[i].setVisible(false);
-			buffState = 2;
-			buffTiming = 5000;
-			velocity = 100;
-			slow.setVisible(false);
-			minus.setVisible(false);
-			fast.setVisible(false);
-			buffTiming = 5;
+			slow[playerNum - 1].setVisible(false);
+			minus[playerNum - 1].setVisible(false);
+			fast[playerNum - 1].setVisible(false);
 			return true;
 		}
 
-		// character and speed increase snowball
-		if ((character.getX() + character.getWidth() - 20) >= (snow_fastArrayImage[i].getX()) &&
-			(character.getX() + 15) <= (snow_fastArrayImage[i].getX() + snow_fastArrayImage[i].getWidth()) &&
-			(character.getY() + character.getHeight()) >= (snow_fastArrayImage[i].getY()) &&
-			(character.getY() + 10) <= (snow_fastArrayImage[i].getY() + snow_fastArrayImage[i].getHeight())){
-			characterWalking.setVisible(false);
-			character.setVisible(true);
+		// c and speed increase snowball
+		if ((c.getX() + c.getWidth() - 20) >= (snow_fastArrayImage[i].getX()) &&
+			(c.getX() + 15) <= (snow_fastArrayImage[i].getX() + snow_fastArrayImage[i].getWidth()) &&
+			(c.getY() + c.getHeight()) >= (snow_fastArrayImage[i].getY()) &&
+			(c.getY() + 10) <= (snow_fastArrayImage[i].getY() + snow_fastArrayImage[i].getHeight())){
+			cw.setVisible(false);
+			c.setVisible(true);
+			if (playerNum == 1)
+			{
+				buffTiming = 5000;
+				buffState = 1;
+				velocity = 200;
+				buffTiming = 5;
+			}
+			else
+			{
+				buffTiming2 = 5000;
+				buffState2 = 1;
+				velocity2 = 200;
+				buffTiming2 = 5;
+			}
+
 			snow_fastArrayImage[i].setY(30);
 			snow_fastArrayImage[i].setVisible(false);
-			buffTiming = 5000;
-			buffState = 1;
-			velocity = 200;
-			buffTiming = 5;
-			slow.setVisible(false);
-			fast.setVisible(true);
-			minus.setVisible(false);
+			slow[playerNum - 1].setVisible(false);
+			fast[playerNum - 1].setVisible(true);
+			minus[playerNum - 1].setVisible(false);
 			return true;
 		}
-		// character walking and speed increase snowball
-		if ((characterWalking.getX() + characterWalking.getWidth() - 20) >= (snow_fastArrayImage[i].getX()) &&
-			(characterWalking.getX() + 15) <= (snow_fastArrayImage[i].getX() + snow_fastArrayImage[i].getWidth()) &&
-			(characterWalking.getY() + characterWalking.getHeight()) >= (snow_fastArrayImage[i].getY()) &&
-			(characterWalking.getY() + 10) <= (snow_fastArrayImage[i].getY() + snow_fastArrayImage[i].getHeight())){
-			characterWalking.setVisible(false);
-			character.setVisible(true);
+		// c walking and speed increase snowball
+		if ((cw.getX() + cw.getWidth() - 20) >= (snow_fastArrayImage[i].getX()) &&
+			(cw.getX() + 15) <= (snow_fastArrayImage[i].getX() + snow_fastArrayImage[i].getWidth()) &&
+			(cw.getY() + cw.getHeight()) >= (snow_fastArrayImage[i].getY()) &&
+			(cw.getY() + 10) <= (snow_fastArrayImage[i].getY() + snow_fastArrayImage[i].getHeight())){
+			if (playerNum == 1)
+			{
+				buffTiming = 5000;
+				buffState = 1;
+				velocity = 200;
+				buffTiming = 5;
+			}
+			else
+			{
+				buffTiming2 = 5000;
+				buffState2 = 1;
+				velocity2 = 200;
+				buffTiming2 = 5;
+			}
+			cw.setVisible(false);
+			c.setVisible(true);
 			snow_fastArrayImage[i].setY(30);
 			snow_fastArrayImage[i].setVisible(false);
-			buffTiming = 5000;
-			buffState = 1;
-			velocity = 200;
-			buffTiming = 5;
-			slow.setVisible(false);
-			fast.setVisible(true);
-			minus.setVisible(false);
+			slow[playerNum - 1].setVisible(false);
+			fast[playerNum - 1].setVisible(true);
+			minus[playerNum - 1].setVisible(false);
 			return true;
 		}
 	}
-	return false;	
+	return false;
 }
 void Hailo::cloudAnimation()
 {
@@ -665,8 +879,7 @@ void Hailo::cloudAnimation()
 
 void Hailo::characterControl()
 {
-	//character controls...
-	characterWalking.update(frameTime);
+
 	if (input->isKeyDown(VK_RIGHT))            // if move right
 	{
 
@@ -680,19 +893,8 @@ void Hailo::characterControl()
 			character.setX(character.getX() + frameTime * velocity);
 			characterWalking.flipHorizontal(false);
 			characterWalking.setX(character.getX() + frameTime * velocity);
-			// for testing collision
-			/*if (collisionDetection()){
-			characterWalking.setVisible(false);
-			}
-			else
-			{
-			characterWalking.setVisible(true);
-			}*/
 			characterWalking.setVisible(true);
 			characterWalking.update(frameTime);
-
-			// testing character's x-coordinates
-			//cout << "Character: " << characterWalking.getX() << endl;
 		}
 
 	}
@@ -712,14 +914,6 @@ void Hailo::characterControl()
 			character.setX(character.getX() - frameTime * velocity);
 			characterWalking.flipHorizontal(true);
 			characterWalking.setX(character.getX() - frameTime * velocity);
-			// for testing collision
-			/*if (collisionDetection()){
-			characterWalking.setVisible(false);
-			}
-			else
-			{
-			characterWalking.setVisible(true);
-			}*/
 			characterWalking.setVisible(true);
 			characterWalking.update(frameTime);
 		}
@@ -729,40 +923,104 @@ void Hailo::characterControl()
 		jumping = true;					//to trigger jump
 		input->clearKeyPress(VK_UP);
 	}
-	else
-	{
-		characterWalking.update(frameTime);
-	}
 	if (input->isKeyDown(VK_UP))             // if jump
 	{
 		jumping = true;					//to trigger jump
 	}
-	else
-		characterWalking.update(frameTime);
+	characterWalking.update(frameTime);
+
+}
+void Hailo::characterControl2()
+{ //Character player 2
+	if (input->isKeyDown(0x44))     // if move right
+	{
+
+		if (character2.getX() > GAME_WIDTH - character2.getWidth())               // if off screen right
+		{
+
+		}
+		else
+		{
+			character2.setVisible(false);
+			character2.setX(character2.getX() + frameTime * velocity);
+			characterWalking2.flipHorizontal(false);
+			characterWalking2.setX(character2.getX() + frameTime * velocity);
+			characterWalking2.setVisible(true);
+			characterWalking2.update(frameTime);
+		}
+
+	}
+	else{
+		character2.setVisible(true);
+		characterWalking2.setVisible(false);
+	}
+	if (input->isKeyDown(0x41))             // if move left
+	{
+
+		if (character2.getX() < 0)         // if off screen left
+		{
+		}
+		else
+		{
+			character2.setVisible(false);
+			character2.setX(character2.getX() - frameTime * velocity);
+			characterWalking2.flipHorizontal(true);
+			characterWalking2.setX(character2.getX() - frameTime * velocity);
+			characterWalking2.setVisible(true);
+			characterWalking2.update(frameTime);
+		}
+	}
+	if (input->wasKeyPressed(0x57))             // if jump
+	{
+		jumping2 = true;					//to trigger jump
+		input->clearKeyPress(0x57);
+	}
+	if (input->isKeyDown(0x57))             // if jump
+	{
+		jumping2 = true;					//to trigger jump
+	}
+	//character controls...
+	characterWalking2.update(frameTime);
 }
 
+
 //when character is hit by hail, this method checks for the frozen state
-void Hailo::frozen()
+void Hailo::frozen(Image c,Image cw, int playerNum)
 {
-	freeze.setY(character.getY() + character.getHeight() / 4);
+	freeze[playerNum - 1].setY(c.getY() + c.getHeight() / 4);
 	//to check if the freeze image x needs an update
-	if (freezedMoved==false)
+	if (freeze[playerNum - 1].getX() != c.getX())
 	{
-		freeze.setX(character.getX());
+		freeze[playerNum - 1].setX(c.getX());
+
 	}
-	freeze.setVisible(freezeState);
-	if (freezeState && character.getY() == 498)
+
+	if (playerNum == 1)
 	{
-		freezedMoved = true;
-		//When it first collide with the character, 
-		//check if the freeze image is on the character
-		if (offsetFromChar == 0)
-			freeze.setX(character.getX());
-		unfreeze();
+		cw.setVisible(false);
+		c.setVisible(true);
+		freeze[playerNum - 1].setVisible(freezeState);
+		if (freezeState && c.getY() == (GAME_HEIGHT - c.getHeight() - 160.0f))
+		{
+
+			freeze[playerNum - 1].setX(c.getX());
+			unfreeze(playerNum, c);
+		}
 	}
-	
-	
+	else
+	{
+		cw.setVisible(false);
+		c.setVisible(true);
+		freeze[playerNum - 1].setVisible(freezeState2);
+		if (freezeState2 && c.getY() == (GAME_HEIGHT - c.getHeight() - 160.0f))
+		{
+			freeze[playerNum - 1].setX(c.getX());
+			unfreeze(playerNum, c);
+		}
+	}
+		
 }
+
 /*Description:Allow the character to jump*/
 void Hailo::jumpingMethod()
 {
@@ -772,7 +1030,7 @@ void Hailo::jumpingMethod()
 		{
 			if (JumpTimer < 150)
 			{
-				JumpTimer += 3;
+				JumpTimer += 3;						
 				//increase Y axis
 				character.setY(character.getY() - frameTime * CHARACTER_JUMP_SPEED);
 				characterWalking.setY(characterWalking.getY() - frameTime * CHARACTER_JUMP_SPEED);
@@ -800,9 +1058,10 @@ void Hailo::jumpingMethod()
 			}
 			else
 			{
-				if (character.getY() > 498 || character.getY() < 498)
+				if (character.getY() != GAME_HEIGHT - character.getHeight() - 160.0f)
 				{
-					character.setY(498);
+					character.setY(GAME_HEIGHT - character.getHeight() - 160.0f);
+					characterWalking.setY(GAME_HEIGHT - character.getHeight() - 160.0f);
 				}
 				jumping = false;
 				increasingYAxisJump = true;
@@ -810,43 +1069,114 @@ void Hailo::jumpingMethod()
 		}
 	}
 }
-
+void Hailo::jumpingMethod2()
+{
+	if (jumping2)
+	{
+		if (increasingYAxisJump2)
+		{
+			if (JumpTimer2 < 150)
+			{
+				JumpTimer2 += 3;
+				//increase Y axis
+				character2.setY(character2.getY() - frameTime * CHARACTER_JUMP_SPEED);
+				characterWalking2.setY(characterWalking2.getY() - frameTime * CHARACTER_JUMP_SPEED);
+			}
+			else
+			{
+				if (character2.getY() <371 || character2.getY() >371 || characterWalking2.getY()<371 || characterWalking2.getY()>371)
+				{
+					character2.setY(371);
+					characterWalking2.setY(371);
+				}
+				else
+				{
+					increasingYAxisJump2 = false;
+				}
+			}
+		}
+		else
+		{
+			if (JumpTimer2 > 0)
+			{
+				JumpTimer2 -= 3;
+				character2.setY(character2.getY() + frameTime * CHARACTER_JUMP_SPEED);
+				characterWalking2.setY(characterWalking2.getY() + frameTime * CHARACTER_JUMP_SPEED);
+			}
+			else
+			{
+				if (character2.getY() != GAME_HEIGHT - character2.getHeight() - 160.0f)
+				{
+					character2.setY(GAME_HEIGHT - character2.getHeight() - 160.0f);
+					characterWalking2.setY(GAME_HEIGHT - character2.getHeight() - 160.0f);
+				}
+				jumping2 = false;
+				increasingYAxisJump2 = true;
+			}
+		}
+	}
+}
 /*Description:When the character is frozen, 
 time limit and the number of times the character
 press down is recorded. The number of times the down is pressed is to speed up the freezing state*/
-void Hailo::unfreeze()
+void Hailo::unfreeze(int playerNum, Image c)
 {
-
+	if (playerNum == 1)
+	{
 	if (input->isKeyDown(VK_DOWN))
 	{
 		stateOfDown = true;		
-		freeze.setX(character.getX() + 20);
+		freeze[playerNum - 1].setX(c.getX() + 20);
 	}
 	if (!input->isKeyDown(VK_DOWN) && stateOfDown == true)
 	{
 		stateOfUp = true;		
-		freeze.setX(character.getX() - 20 );
+		freeze[playerNum - 1].setX(c.getX() - 20);
 	}
 	if (stateOfUp)
 	{
-
 		stateOfDown = false;
 		stateOfUp = false;
 		countDownKey++;
-		unfreezeTimer -= 0.1;
+		unfreezeTimer -= 0.01;				
 	}
-	cout << gameTime - unfreezeTimer << endl;
-	if (countDownKey >= 20 || (gameTime-unfreezeTimer)>=FREEZETIME)//around 10 seconds or key was pressed and released 20 or more times
+		if (countDownKey >= 20 || (gameTime - unfreezeTimer) >= FREEZETIME)//around 10 seconds or key was pressed and released 20 or more times
+		{
+			enableKey = true;
+			countDownKey = 0;
+			unfreezeTimer = gameTime;
+			freezeState = false;
+			freeze[playerNum - 1].setVisible(freezeState);
+		}
+	}
+	else
 	{
-		enableKey = true;
-		countDownKey = 0;
-		unfreezeTimer = gameTime;
-		freezeState = false;
-		freezedMoved = false;
-		offsetFromChar = 0;
-		freeze.setVisible(freezeState);
+		if (input->isKeyDown(0x53))
+		{
+			stateOfDown2 = true;
+			freeze[playerNum - 1].setX(c.getX() + 20);
+		}
+		if (!input->isKeyDown(0x53) && stateOfDown2 == true)
+		{
+			stateOfUp2 = true;
+			freeze[playerNum - 1].setX(c.getX() - 20);
+		}
+		if (stateOfUp2)
+		{
+			stateOfDown2 = false;
+			stateOfUp2 = false;
+			countDownKey2++;
+			unfreezeTimer2 -= 0.01;;
+		}
+		if (countDownKey2 >= 20 || (gameTime - unfreezeTimer2) >= FREEZETIME)//around 10 seconds or key was pressed and released 20 or more times
+		{
+			enableKey2 = true;
+			countDownKey2 = 0;
+			unfreezeTimer2 = gameTime;
+			freezeState2 = false;
+			freeze[playerNum - 1].setVisible(freezeState2);
+		}
 	}
-
 }
 void Hailo::importImage()
 {
@@ -858,7 +1188,7 @@ void Hailo::importImage()
 	if (!startPage.initialize(graphics, 0, 0, 0, &startPageTexture))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 	//character type Image
-
+	//PLAYER 1
 	// characterWalking texture
 	if (!characterWalkingTexture.initialize(graphics, CHARACTERWALKING_IMAGE))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing character walking texture"));
@@ -873,10 +1203,27 @@ void Hailo::importImage()
 
 	// character
 	if (!character.initialize(graphics, CHARACTER_WIDTH, CHARACTER_HEIGHT, CHARACTER_COLS, &characterTexture))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));	
+
+	//PLAYER 2
+	// characterWalking texture
+	if (!characterWalkingTexture2.initialize(graphics, CHARACTERWALKING2_IMAGE))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing character walking texture"));
+
+	// characterWalking
+	if (!characterWalking2.initialize(graphics, CHARACTERWALKING_WIDTH, CHARACTERWALKING_HEIGHT, CHARACTERWALKING_COLS, &characterWalkingTexture2))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 
-	//dropping from the sky
+	// character texture
+	if (!characterTexture2.initialize(graphics, CHARACTER2_IMAGE))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing character texture"));
 
+	// character
+	if (!character2.initialize(graphics, CHARACTER_WIDTH, CHARACTER_HEIGHT, CHARACTER_COLS, &characterTexture2))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
+
+
+	//Objects dropping from the sky
 	// hail texture
 	if (!hailTexture.initialize(graphics, HAIL_IMAGE))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing hail texture"));
@@ -945,25 +1292,35 @@ void Hailo::importImage()
 	if (!freezeTexture.initialize(graphics, FREEZE_IMAGE))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing freeze texture"));
 
-	// freeze
-	if (!freeze.initialize(graphics, 0, 0, 0, &freezeTexture))
-		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
-
 	// minus texture
 	if (!minusTexture.initialize(graphics, MINUS_IMAGE))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing minus texture"));
 
-	// minus
-	if (!minus.initialize(graphics, 0, 0, 0, &minusTexture))
-		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 	// slow texture
 	if (!slowTexture.initialize(graphics, SLOW_IMAGE))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing slow texture"));
 
+
+	// freeze
+	if (!freeze[0].initialize(graphics, 0, 0, 0, &freezeTexture))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
+	// minus
+	if (!minus[0].initialize(graphics, 0, 0, 0, &minusTexture))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 	// slow
-	if (!slow.initialize(graphics, 0, 0, 0, &slowTexture))
+	if (!slow[0].initialize(graphics, 0, 0, 0, &slowTexture))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 	
+	// freeze
+	if (!freeze[1].initialize(graphics, 0, 0, 0, &freezeTexture))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
+	// minus
+	if (!minus[1].initialize(graphics, 0, 0, 0, &minusTexture))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
+	// slow
+	if (!slow[1].initialize(graphics, 0, 0, 0, &slowTexture))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
+
 	//snowman parts
 
 	// snowman
@@ -1005,7 +1362,10 @@ void Hailo::importImage()
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing fast texture"));
 
 	// fast
-	if (!fast.initialize(graphics, 0, 0, 0, &fastTexture))
+	if (!fast[0].initialize(graphics, 0, 0, 0, &fastTexture))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
+	// fast
+	if (!fast[1].initialize(graphics, 0, 0, 0, &fastTexture))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 
 }
@@ -1087,99 +1447,198 @@ int Hailo::getNonDuplicateRanNum()
 		}
 	} while (repeat);	
 }
-void Hailo::buffStateCheck()
+void Hailo::buffStateCheck(Image c,Image cw, int playerNum)
 {
-	if (buffState == 1)//fast speed
+	if (playerNum == 1)
 	{
-		fast.setX(character.getCenterX() - fast.getWidth() / 2);
-		fast.setY(character.getCenterY() - fast.getHeight() / 2);
-		if ((gameTime - buffForEffectTime) > BUFFTIME && buffTiming > 0)
+		if (buffState == 1)//fast speed
 		{
-			buffTiming--;
-			fast.update(frameTime);
-			buffForEffectTime = gameTime;
-		}
-		if (buffTiming <= 0)
-		{
-			buffState = 0;
-			velocity = 100;
-			fast.setVisible(false);
-			buffTiming = 5;
-		}
-	}
-	else if (buffState == 2)
-	{
-		//animation
-		if (invincibleTime <= 2)
-		{
-			character.setVisible(false);
-			characterWalking.setVisible(false);
-		}
-		else
-		{
-			if (input->isKeyDown(VK_LEFT) || input->isKeyDown(VK_RIGHT))
-				characterWalking.setVisible(true);
-			else
-				character.setVisible(true);
-		}
-		if (invincibleTime >= 4)
-			invincibleTime = 0;
-		invincibleTime++;
-		if ((gameTime - buffForEffectTime)>BUFFTIME&&buffTiming > 0)
-		{	
-			buffTiming--;
-			buffForEffectTime = gameTime;
-		}	
-		if (buffTiming <= 0)
-		{
-			if (input->isKeyDown(VK_UP) || input->isKeyDown(VK_LEFT) || input->isKeyDown(VK_RIGHT))
+			fast[playerNum - 1].setX(c.getCenterX() - fast[playerNum - 1].getWidth() / 2);
+			fast[playerNum - 1].setY(c.getCenterY() - fast[playerNum - 1].getHeight() / 2);
+			if ((gameTime - buffForEffectTime) > BUFFTIME && buffTiming > 0)
 			{
-				characterWalking.setVisible(true);
+				buffTiming--;
+				fast[playerNum - 1].update(frameTime);
+				buffForEffectTime = gameTime;
+			}
+			if (buffTiming <= 0)
+			{
+				buffState = 0;
+				velocity = 100;
+				fast[playerNum - 1].setVisible(false);
+				buffTiming = 5;
+			}
+		}
+		else if (buffState == 2)
+		{
+			//animation
+			if (invincibleTime <= 2)
+			{
+				c.setVisible(false);
+				cw.setVisible(false);
 			}
 			else
 			{
-				character.setVisible(true);
+				if (input->isKeyDown(VK_LEFT) || input->isKeyDown(VK_RIGHT))
+					cw.setVisible(true);
+				else
+					c.setVisible(true);
 			}
-			buffState = 0;
-			invincibleTime = 1000;
-			buffTiming = 5;
+			if (invincibleTime >= 4)
+				invincibleTime = 0;
+			invincibleTime++;
+			if ((gameTime - buffForEffectTime) > BUFFTIME&&buffTiming > 0)
+			{
+				buffTiming--;
+				buffForEffectTime = gameTime;
+			}
+			if (buffTiming <= 0)
+			{
+				if (input->isKeyDown(VK_UP) || input->isKeyDown(VK_LEFT) || input->isKeyDown(VK_RIGHT))
+				{
+					cw.setVisible(true);
+				}
+				else
+				{
+					c.setVisible(true);
+				}
+				buffState = 0;
+				invincibleTime = 1000;
+				buffTiming = 5;
+			}
+		}
+		else if (buffState == 3)//slow speed
+		{
+			slow[playerNum - 1].setX(c.getCenterX() - slow[playerNum - 1].getWidth() / 2);
+			slow[playerNum - 1].setY(c.getCenterY() - slow[playerNum - 1].getHeight() / 2);
+			if ((gameTime - buffForEffectTime) > BUFFTIME&&buffTiming > 0)
+			{
+				buffTiming--;
+				slow[playerNum - 1].setVisible(true);
+				buffForEffectTime = gameTime;
+				slow[playerNum - 1].update(frameTime);
+			}
+			if (buffTiming <= 0)
+			{
+				slow[playerNum - 1].setVisible(false);
+				buffState = 0;
+				velocity = 100;
+				buffTiming = 5;
+			}
+		}
+		else if (buffState == 4)//minus points
+		{
+			minus[playerNum - 1].setX(c.getCenterX() - minus[playerNum - 1].getWidth() / 2);
+			minus[playerNum - 1].setY(c.getCenterY() - minus[playerNum - 1].getHeight() / 2);
+			if ((gameTime - buffForEffectTime) > BUFFTIME&&buffTiming > 0)
+			{
+				buffTiming--;
+				minus[playerNum - 1].setVisible(true);
+				buffForEffectTime = gameTime;
+				minus[playerNum - 1].update(frameTime);
+			}
+			if (buffTiming <= 0)
+			{
+				minus[playerNum - 1].setVisible(false);
+				buffState = 0;
+				buffTiming = 5;
+			}
 		}
 	}
-	else if (buffState == 3)//slow speed
+	else
 	{
-		slow.setX(character.getCenterX() - slow.getWidth() / 2);
-		slow.setY(character.getCenterY() - slow.getHeight() / 2);
-		if ((gameTime - buffForEffectTime)>BUFFTIME&&buffTiming > 0)
-		{			
-			buffTiming--;
-			slow.setVisible(true);
-			buffForEffectTime = gameTime;
-			slow.update(frameTime);
-		}
-		if (buffTiming <= 0)
+		if (buffState2 == 1)//fast speed
 		{
-			slow.setVisible(false);
-			buffState = 0;
-			velocity = 100;
-			buffTiming = 5;
+			fast[playerNum - 1].setX(c.getCenterX() - fast[playerNum - 1].getWidth() / 2);
+			fast[playerNum - 1].setY(c.getCenterY() - fast[playerNum - 1].getHeight() / 2);
+			if ((gameTime - buffForEffectTime2) > BUFFTIME && buffTiming2 > 0)
+			{
+				buffTiming2--;
+				fast[playerNum - 1].update(frameTime);
+				buffForEffectTime2 = gameTime;
+			}
+			if (buffTiming2 <= 0)
+			{
+				buffState2 = 0;
+				velocity2 = 100;
+				fast[playerNum - 1].setVisible(false);
+				buffTiming2 = 5;
+			}
 		}
-	}
-	else if (buffState == 4)//minus points
-	{
-		minus.setX(character.getCenterX() - minus.getWidth() / 2);
-		minus.setY(character.getCenterY() - minus.getHeight() / 2);
-		if ((gameTime - buffForEffectTime)>BUFFTIME&&buffTiming > 0)
-		{		
-			buffTiming--;
-			minus.setVisible(true);			
-			buffForEffectTime = gameTime;
-			minus.update(frameTime);						
-		}
-		if (buffTiming<=0)
+		else if (buffState2 == 2)
 		{
-			minus.setVisible(false);
-			buffState = 0;			
-			buffTiming = 5;
+			//animation
+			if (invincibleTime2 <= 2)
+			{
+				c.setVisible(false);
+				cw.setVisible(false);
+			}
+			else
+			{
+				if (input->isKeyDown(VK_LEFT) || input->isKeyDown(VK_RIGHT))
+					cw.setVisible(true);
+				else
+					c.setVisible(true);
+			}
+			if (invincibleTime2 >= 4)
+				invincibleTime2 = 0;
+			invincibleTime2++;
+			if ((gameTime - buffForEffectTime2) > BUFFTIME&&buffTiming2 > 0)
+			{
+				buffTiming2--;
+				buffForEffectTime2 = gameTime;
+			}
+			if (buffTiming2 <= 0)
+			{
+				if (input->isKeyDown(0x44) || input->isKeyDown(0x53) || input->isKeyDown(0x57))
+				{
+					cw.setVisible(true);
+				}
+				else
+				{
+					c.setVisible(true);
+				}
+				buffState2 = 0;
+				invincibleTime2 = 1000;
+				buffTiming2 = 5;
+			}
+		}
+		else if (buffState2 == 3)//slow speed
+		{
+			slow[playerNum - 1].setX(c.getCenterX() - slow[playerNum - 1].getWidth() / 2);
+			slow[playerNum - 1].setY(c.getCenterY() - slow[playerNum - 1].getHeight() / 2);
+			if ((gameTime - buffForEffectTime2) > BUFFTIME&&buffTiming > 0)
+			{
+				buffTiming2--;
+				slow[playerNum - 1].setVisible(true);
+				buffForEffectTime2= gameTime;
+				slow[playerNum - 1].update(frameTime);
+			}
+		if (buffTiming2 <= 0)
+			{
+				slow[playerNum - 1].setVisible(false);
+				buffState2 = 0;
+				velocity2 = 100;
+				buffTiming2 = 5;
+			}
+		}
+		else if (buffState2 == 4)//minus points
+		{
+			minus[playerNum - 1].setX(c.getCenterX() - minus[playerNum - 1].getWidth() / 2);
+			minus[playerNum - 1].setY(c.getCenterY() - minus[playerNum - 1].getHeight() / 2);
+			if ((gameTime - buffForEffectTime2) > BUFFTIME&&buffTiming2 > 0)
+			{
+				buffTiming2--;
+				minus[playerNum - 1].setVisible(true);
+				buffForEffectTime2 = gameTime;
+				minus[playerNum - 1].update(frameTime);
+			}
+			if (buffTiming2 <= 0)
+			{
+				minus[playerNum - 1].setVisible(false);
+				buffState2 = 0;
+				buffTiming2 = 5;
+			}
 		}
 	}
 }
@@ -1199,3 +1658,4 @@ int Hailo::displayTimer(){
 		return 0;
 	}
 }
+

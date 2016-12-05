@@ -20,64 +20,73 @@ private:
 	TextDX  *dxFontMedium;
 	TextDX  *dxFontLarge;
     // variables
-	//character 
+	//character player 2
 	TextureManager characterTexture;
 	Image character;
 	TextureManager characterWalkingTexture;
 	Image characterWalking;
 
+	//character player 2
+	TextureManager characterTexture2;
+	Image character2;
+	TextureManager characterWalkingTexture2;
+	Image characterWalking2;
 
-
+	//Background
 	TextureManager backgroundTexture;
 	Image   background;
-
+	
+	//start page
 	TextureManager startPageTexture;
 	Image   startPage;
 	
+
 	TextureManager cloudTexture;
 	Image cloud;
-	//dropping items
+
+	//Dropping item
 	TextureManager hailTexture;
 	Image hail;
 	TextureManager snowTexture;
-	TextureManager fastTexture;
 	Image snow;
-	Image snow_fast;
-	Image snow_invicible;
-	Image snow_minus;
-	Image snow_slow;
-	Image fast;
+
+	//snow for buff
 	TextureManager snow_fastTexture;
+	Image snow_fast;
 	TextureManager snow_invincibleTexture;
+	Image snow_invicible;
 	TextureManager snow_minusTexture;
+	Image snow_minus;
 	TextureManager snow_slowTexture;
-
-
+	Image snow_slow;
+	
 	//snowman
-	Image snowman;
-	Image snowman_head;
 	TextureManager snowmanTexture;
+	Image snowman;
 	TextureManager snowman_headTexture;
+	Image snowman_head;
 
-	//state of character
+	//icon for state of character
 	TextureManager freezeTexture;
-	Image freeze;
-	Image minus;
-	Image	slow;
+	Image freeze[2];
 	TextureManager minusTexture;
+	Image minus[2];
 	TextureManager	slowTexture;
+	Image	slow[2];
+	TextureManager fastTexture;
+	Image fast[2];
 
-
+	//spawning of the snow
 	float gameTime = 0;
 	float lastSnowSpawnTime = 0;
 	float lastHailSpawnTime = 0;
 	float lastsnow_fastSpawnTime = 0;
 	float lastsnow_invincibleSpawnTime = 0;
 	float lastsnow_minusSpawnTime = 0;
-	float lastsnow_slowSpawnTime = 0;
-	float unfreezeTimer = 0;
+	float lastsnow_slowSpawnTime = 0;	
 
-	int JumpTimer = 0;
+	//Jump function for player 1
+	float JumpTimer = 0;
 	bool jumping = false;
 	bool increasingYAxisJump = true;
 	bool enableKey = true;
@@ -85,16 +94,34 @@ private:
 	bool stateOfDown = false;
 	int countDownKey = 0;
 	bool freezeState = false;
+	float unfreezeTimer = 0;
+
+	//Jump function for player 2
+	float JumpTimer2 = 0;
+	bool jumping2 = false;
+	bool increasingYAxisJump2 = true;
+	bool enableKey2 = true;
+	bool stateOfUp2 = false;
+	bool stateOfDown2 = false;
+	int countDownKey2 = 0;
+	bool freezeState2 = false;
+	float unfreezeTimer2 = 0;
+
+	//buffing state time for Player 1
 	int buffTiming = 5;
+	float buffForEffectTime = 0;
 	int invincibleTime = 0;
 	int buffState = 0;
 	int velocity = 100;
-	int offsetFromChar = 0;
-	bool freezedMoved = false;
-	float buffForEffectTime = 0;
 
+	//buffing state time for Player 2
+	int buffTiming2 = 5;
+	float buffForEffectTime2 = 0;
+	int invincibleTime2 = 0;
+	int buffState2 = 0;
+	int velocity2 = 100;
 
-	//arrays
+	//arrays for snow
 	Image snowArrayImage[20];
 	Image hailArrayImage[20];
 	Image snow_fastArrayImage[20];
@@ -102,9 +129,14 @@ private:
 	Image snow_minusArrayImage[20];
 	Image snow_slowArrayImage[20];
 	int preventSameColumnSpawning[6];
-	
+		
+	//health and score for player 1
 	int p1Score;
 	int p1Health = 3;
+
+	//health and score for player 2
+	int p2Score;
+	int p2Health = 3;
 
 	int timer = 60;
 	int elapsed_secs = 0;
@@ -129,19 +161,20 @@ public:
     void releaseAll();
     void resetAll();
 	void itemSpawn();
-	boolean collisionDetection();
+	boolean collisionDetection(Image c, Image cw, int playerNum);
 	void cloudAnimation();
 	void characterControl();
-	void frozen();
+	void characterControl2();
+	void frozen(Image c, Image cw, int playerNum);
 	void jumpingMethod();
-	void unfreeze();
+	void unfreeze(int playerNum, Image c);
 	void importImage();
 	void snowAndHailArrayInitialization();
 	int getNonDuplicateRanNum();
 	int displayTimer();
 	void checkHealth();
-	void buffStateCheck();
+	void buffStateCheck(Image c, Image cw, int playerNum);
+	void jumpingMethod2();
 };
-
 #endif
 
