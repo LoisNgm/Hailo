@@ -25,8 +25,10 @@
 //-----------------------------------------------
 // graphic images
 const char BACKGROUND_IMAGE[] = "pictures\\background.png";  // background
-const char CHARACTER_IMAGE[] = "pictures\\character_white_resting.png";//character
-const char CHARACTERWALKING_IMAGE[] = "pictures\\character_white_walking.png";//characterWALKING
+const char CHARACTER_IMAGE[] = "pictures\\character_white_resting.png";//character player 1
+const char CHARACTERWALKING_IMAGE[] = "pictures\\character_white_walking.png";//characterwalking player 1
+const char CHARACTER2_IMAGE[] = "pictures\\character_grey_resting.png";//character player 2
+const char CHARACTERWALKING2_IMAGE[] = "pictures\\character_grey_walking.png";//characterWalking player 2
 const char CLOUD_IMAGE[] = "pictures\\clouds.png";//cloud
 const char HAIL_IMAGE[] = "pictures\\Hail.png";//hail
 const char SNOW_IMAGE[] = "pictures\\snow.png";//snow
@@ -80,7 +82,7 @@ const float SNOW_SPEED = 100.00f;
 const float CHARACTER_SPEED = 100.0f;
 const float CHARACTER_JUMP_SPEED = 500.0f;
 
-//character 
+//character  
 const int  CHARACTER_START_FRAME = 0;         // starting frame of CHARACTER animation
 const int  CHARACTER_END_FRAME = 3;           // last frame of CHARACTER animation
 const float CHARACTER_ANIMATION_DELAY = 0.2f; // time between frames of CHARACTER animation
@@ -103,8 +105,5 @@ const float SNOWMAN_ANIMATION_DELAY = 0.3f; // time between frames of SNOWMAN an
 const int  SNOWMAN_COLS = 4;                // SNOWMAN texture has 1 columns
 const int  SNOWMAN_WIDTH = 114;              // width of SNOWMAN image
 const int  SNOWMAN_HEIGHT = 127;             // height of SNOWMAN image
-
-
-
 
 #endif

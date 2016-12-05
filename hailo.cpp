@@ -2,6 +2,7 @@
 #include "hailo.h"
 #include <iostream>
 #include <time.h> 
+
 using namespace std;
 
 //=============================================================================
@@ -34,7 +35,6 @@ void Hailo::initialize(HWND hwnd)
 	importImage();
 	snowAndHailArrayInitialization();
 	
-
 	//snowman
 	snowman.setX(GAME_WIDTH / 2 - snowman.getWidth()/2);
 	snowman.setY(GAME_HEIGHT - snowman.getHeight() - 160.0f);
@@ -63,6 +63,7 @@ void Hailo::initialize(HWND hwnd)
 
 	freeze.setVisible(false);
 
+	//Character player 1
 	character.setY(GAME_HEIGHT - character.getHeight() - 160.0f);
 	characterWalking.setY(GAME_HEIGHT - character.getHeight() - 160.0f);
 	characterWalking.setCurrentFrame(CHARACTERWALKING_START_FRAME);
@@ -71,6 +72,16 @@ void Hailo::initialize(HWND hwnd)
 	characterWalking.setVisible(false);
 	character.setVisible(true);
 	
+	//Character player 2
+	character2.setY(GAME_HEIGHT - character2.getHeight() - 160.0f);
+	characterWalking2.setY(GAME_HEIGHT - character2.getHeight() - 160.0f);
+	characterWalking2.setCurrentFrame(CHARACTERWALKING_START_FRAME);
+	characterWalking2.setFrames(CHARACTERWALKING_START_FRAME, CHARACTERWALKING_END_FRAME);
+	characterWalking2.setFrameDelay(CHARACTERWALKING_ANIMATION_DELAY);
+	characterWalking2.setVisible(false);
+	character2.setVisible(true);
+
+
 	// 15 pixel high Arial
 	if (dxFontSmall->initialize(graphics, 15, true, false, "Arial") == false)
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing DirectX font"));
@@ -88,7 +99,6 @@ void Hailo::initialize(HWND hwnd)
 	
     return;
 }
-int counting = 0;
 //=============================================================================
 // Update all game items
 //=============================================================================
@@ -107,6 +117,7 @@ void Hailo::update()
 	{
 		frozen();
 	}
+	
 	characterWalking.update(frameTime);
 	snowman.update(frameTime);
 	buffStateCheck();
@@ -182,6 +193,8 @@ void Hailo::render()
 		}
 		character.draw();
 		characterWalking.draw();
+		character2.draw();
+		characterWalking2.draw();
 		freeze.draw();
 		minus.draw();
 		slow.draw();
@@ -249,6 +262,7 @@ void Hailo::resetAll()
 	freezeTexture.onResetDevice();
 	minusTexture.onResetDevice();
 	slowTexture.onResetDevice();
+	fastTexture.onResetDevice();
 	snow_fastTexture.onResetDevice();
 	snow_invincibleTexture.onResetDevice();
 	snowmanTexture.onResetDevice();
@@ -256,8 +270,7 @@ void Hailo::resetAll()
 	snow_minusTexture.onResetDevice();
 	snow_slowTexture.onResetDevice();
 	startPageTexture.onResetDevice();
-	fastTexture.onResetDevice();
-    Game::resetAll();
+	Game::resetAll();
     return;
 }
 //spawning hail and snow
@@ -665,8 +678,7 @@ void Hailo::cloudAnimation()
 
 void Hailo::characterControl()
 {
-	//character controls...
-	characterWalking.update(frameTime);
+
 	if (input->isKeyDown(VK_RIGHT))            // if move right
 	{
 
@@ -680,19 +692,8 @@ void Hailo::characterControl()
 			character.setX(character.getX() + frameTime * velocity);
 			characterWalking.flipHorizontal(false);
 			characterWalking.setX(character.getX() + frameTime * velocity);
-			// for testing collision
-			/*if (collisionDetection()){
-			characterWalking.setVisible(false);
-			}
-			else
-			{
-			characterWalking.setVisible(true);
-			}*/
 			characterWalking.setVisible(true);
 			characterWalking.update(frameTime);
-
-			// testing character's x-coordinates
-			//cout << "Character: " << characterWalking.getX() << endl;
 		}
 
 	}
@@ -712,14 +713,6 @@ void Hailo::characterControl()
 			character.setX(character.getX() - frameTime * velocity);
 			characterWalking.flipHorizontal(true);
 			characterWalking.setX(character.getX() - frameTime * velocity);
-			// for testing collision
-			/*if (collisionDetection()){
-			characterWalking.setVisible(false);
-			}
-			else
-			{
-			characterWalking.setVisible(true);
-			}*/
 			characterWalking.setVisible(true);
 			characterWalking.update(frameTime);
 		}
@@ -728,17 +721,64 @@ void Hailo::characterControl()
 	{
 		jumping = true;					//to trigger jump
 		input->clearKeyPress(VK_UP);
-	}
-	else
-	{
-		characterWalking.update(frameTime);
-	}
+	}	
 	if (input->isKeyDown(VK_UP))             // if jump
 	{
 		jumping = true;					//to trigger jump
 	}
-	else
-		characterWalking.update(frameTime);
+
+
+	//Character player 2
+	if (input->isKeyDown(0x44))     // if move right
+	{
+
+		if (character2.getX() > GAME_WIDTH - character2.getWidth())               // if off screen right
+		{
+
+		}
+		else
+		{
+			character2.setVisible(false);
+			character2.setX(character.getX() + frameTime * velocity);
+			characterWalking2.flipHorizontal(false);
+			characterWalking2.setX(character.getX() + frameTime * velocity);
+			characterWalking2.setVisible(true);
+			characterWalking2.update(frameTime);
+		}
+
+	}
+	else{
+		character2.setVisible(true);
+		characterWalking2.setVisible(false);
+	}
+	if (input->isKeyDown(0x41))             // if move left
+	{
+
+		if (character2.getX() < 0)         // if off screen left
+		{
+		}
+		else
+		{
+			character2.setVisible(false);
+			character2.setX(character.getX() - frameTime * velocity);
+			characterWalking2.flipHorizontal(true);
+			characterWalking2.setX(character.getX() - frameTime * velocity);
+			characterWalking2.setVisible(true);
+			characterWalking2.update(frameTime);
+		}
+	}
+	if (input->wasKeyPressed(0x57))             // if jump
+	{
+		jumping2 = true;					//to trigger jump
+		input->clearKeyPress(0x57);
+	}
+	if (input->isKeyDown(0x57))             // if jump
+	{
+		jumping2 = true;					//to trigger jump
+	}
+	//character controls...
+	characterWalking.update(frameTime);
+	characterWalking2.update(frameTime);
 }
 
 //when character is hit by hail, this method checks for the frozen state
@@ -746,23 +786,21 @@ void Hailo::frozen()
 {
 	freeze.setY(character.getY() + character.getHeight() / 4);
 	//to check if the freeze image x needs an update
-	if (freezedMoved==false)
+	if (freeze.getX()!=character.getX())
 	{
 		freeze.setX(character.getX());
 	}
 	freeze.setVisible(freezeState);
-	if (freezeState && character.getY() == 498)
+//	character.setY(GAME_HEIGHT - character.getHeight() - 160.0f);
+	if (freezeState && character.getY() == (GAME_HEIGHT-character.getHeight()-160.0f))
 	{
-		freezedMoved = true;
-		//When it first collide with the character, 
-		//check if the freeze image is on the character
-		if (offsetFromChar == 0)
-			freeze.setX(character.getX());
+		freeze.setX(character.getX());
 		unfreeze();
 	}
 	
 	
 }
+
 /*Description:Allow the character to jump*/
 void Hailo::jumpingMethod()
 {
@@ -772,7 +810,7 @@ void Hailo::jumpingMethod()
 		{
 			if (JumpTimer < 150)
 			{
-				JumpTimer += 3;
+				JumpTimer += 3;						
 				//increase Y axis
 				character.setY(character.getY() - frameTime * CHARACTER_JUMP_SPEED);
 				characterWalking.setY(characterWalking.getY() - frameTime * CHARACTER_JUMP_SPEED);
@@ -800,9 +838,10 @@ void Hailo::jumpingMethod()
 			}
 			else
 			{
-				if (character.getY() > 498 || character.getY() < 498)
+				if (character.getY() != GAME_HEIGHT - character.getHeight() - 160.0f)
 				{
-					character.setY(498);
+					character.setY(GAME_HEIGHT - character.getHeight() - 160.0f);
+					characterWalking.setY(GAME_HEIGHT - character.getHeight() - 160.0f);
 				}
 				jumping = false;
 				increasingYAxisJump = true;
@@ -842,8 +881,6 @@ void Hailo::unfreeze()
 		countDownKey = 0;
 		unfreezeTimer = gameTime;
 		freezeState = false;
-		freezedMoved = false;
-		offsetFromChar = 0;
 		freeze.setVisible(freezeState);
 	}
 
@@ -858,7 +895,7 @@ void Hailo::importImage()
 	if (!startPage.initialize(graphics, 0, 0, 0, &startPageTexture))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 	//character type Image
-
+	//PLAYER 1
 	// characterWalking texture
 	if (!characterWalkingTexture.initialize(graphics, CHARACTERWALKING_IMAGE))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing character walking texture"));
@@ -873,10 +910,27 @@ void Hailo::importImage()
 
 	// character
 	if (!character.initialize(graphics, CHARACTER_WIDTH, CHARACTER_HEIGHT, CHARACTER_COLS, &characterTexture))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));	
+
+	//PLAYER 2
+	// characterWalking texture
+	if (!characterWalkingTexture2.initialize(graphics, CHARACTERWALKING2_IMAGE))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing character walking texture"));
+
+	// characterWalking
+	if (!characterWalking2.initialize(graphics, CHARACTERWALKING_WIDTH, CHARACTERWALKING_HEIGHT, CHARACTERWALKING_COLS, &characterWalkingTexture2))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 
-	//dropping from the sky
+	// character texture
+	if (!characterTexture2.initialize(graphics, CHARACTER2_IMAGE))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing character texture"));
 
+	// character
+	if (!character2.initialize(graphics, CHARACTER_WIDTH, CHARACTER_HEIGHT, CHARACTER_COLS, &characterTexture2))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
+
+
+	//Objects dropping from the sky
 	// hail texture
 	if (!hailTexture.initialize(graphics, HAIL_IMAGE))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing hail texture"));
@@ -1007,7 +1061,6 @@ void Hailo::importImage()
 	// fast
 	if (!fast.initialize(graphics, 0, 0, 0, &fastTexture))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
-
 }
 
 void Hailo::snowAndHailArrayInitialization()

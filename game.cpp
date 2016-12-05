@@ -12,6 +12,7 @@ Game::Game()
     // additional initialization is handled in later call to input->initialize()
     paused = true;             // game is not paused
     graphics = NULL;
+
     initialized = false;
 }
 
@@ -236,3 +237,4 @@ void Game::deleteAll()
     SAFE_DELETE(input);
     initialized = false;
 }
+
