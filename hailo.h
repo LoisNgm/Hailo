@@ -44,15 +44,13 @@ private:
 	TextureManager cloudTexture;
 	Image cloud;
 
-	//Dropping items
+	//Dropping item
 	TextureManager hailTexture;
 	Image hail;
 	TextureManager snowTexture;
 	Image snow;
-	TextureManager fastTexture;
-	Image fast;
 
-	//icon for buff
+	//snow for buff
 	TextureManager snow_fastTexture;
 	Image snow_fast;
 	TextureManager snow_invincibleTexture;
@@ -68,13 +66,15 @@ private:
 	TextureManager snowman_headTexture;
 	Image snowman_head;
 
-	//state of character
+	//icon for state of character
 	TextureManager freezeTexture;
-	Image freeze;
+	Image freeze[2];
 	TextureManager minusTexture;
-	Image minus;
+	Image minus[2];
 	TextureManager	slowTexture;
-	Image	slow;
+	Image	slow[2];
+	TextureManager fastTexture;
+	Image fast[2];
 
 	//spawning of the snow
 	float gameTime = 0;
@@ -83,8 +83,7 @@ private:
 	float lastsnow_fastSpawnTime = 0;
 	float lastsnow_invincibleSpawnTime = 0;
 	float lastsnow_minusSpawnTime = 0;
-	float lastsnow_slowSpawnTime = 0;
-	float unfreezeTimer = 0;
+	float lastsnow_slowSpawnTime = 0;	
 
 	//Jump function for player 1
 	float JumpTimer = 0;
@@ -95,6 +94,7 @@ private:
 	bool stateOfDown = false;
 	int countDownKey = 0;
 	bool freezeState = false;
+	float unfreezeTimer = 0;
 
 	//Jump function for player 2
 	float JumpTimer2 = 0;
@@ -105,6 +105,7 @@ private:
 	bool stateOfDown2 = false;
 	int countDownKey2 = 0;
 	bool freezeState2 = false;
+	float unfreezeTimer2 = 0;
 
 	//buffing state time for Player 1
 	int buffTiming = 5;
@@ -160,19 +161,20 @@ public:
     void releaseAll();
     void resetAll();
 	void itemSpawn();
-	boolean collisionDetection();
+	boolean collisionDetection(Image c, Image cw, int playerNum);
 	void cloudAnimation();
 	void characterControl();
-	void frozen();
+	void characterControl2();
+	void frozen(Image c, Image cw, int playerNum);
 	void jumpingMethod();
-	void unfreeze();
+	void unfreeze(int playerNum, Image c);
 	void importImage();
 	void snowAndHailArrayInitialization();
 	int getNonDuplicateRanNum();
 	int displayTimer();
 	void checkHealth();
-	void buffStateCheck();
+	void buffStateCheck(Image c, Image cw, int playerNum);
+	void jumpingMethod2();
 };
-
 #endif
 
