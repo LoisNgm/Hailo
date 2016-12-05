@@ -33,7 +33,8 @@ private:
 
 	TextureManager startPageTexture;
 	Image   startPage;
-	
+
+
 	TextureManager cloudTexture;
 	Image cloud;
 	//dropping items
@@ -112,6 +113,9 @@ private:
 	int gameStart = 0;
 	clock_t begin;
 	clock_t end;
+
+	//TextureManager endPageTexture;
+	//Image   endPage;
 
 public:
     // Constructor

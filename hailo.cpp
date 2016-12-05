@@ -205,6 +205,18 @@ void Hailo::render()
 		//dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 	}
 	graphics->spriteEnd();
+	if (gameStart == 3){
+		cout << "here!" << endl;
+	}
+	/*if (gameStart == 3){
+		graphics->spriteBegin();
+		endPage.draw();
+		graphics->spriteEnd();
+		if (input->anyKeyPressed()){
+			gameStart = 0;
+			deleteAll();
+		}
+	}*/
 }
 
 //=============================================================================
@@ -230,6 +242,7 @@ void Hailo::releaseAll()
 	snow_slowTexture.onLostDevice();
 	startPageTexture.onLostDevice();
 	fastTexture.onLostDevice();
+	//endPageTexture.onLostDevice();
     Game::releaseAll();
     return;
 }
@@ -257,6 +270,7 @@ void Hailo::resetAll()
 	snow_slowTexture.onResetDevice();
 	startPageTexture.onResetDevice();
 	fastTexture.onResetDevice();
+	//endPageTexture.onResetDevice();
     Game::resetAll();
     return;
 }
@@ -857,6 +871,15 @@ void Hailo::importImage()
 	// start page
 	if (!startPage.initialize(graphics, 0, 0, 0, &startPageTexture))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
+
+	// end page texture
+	//if (!endPageTexture.initialize(graphics, END_PAGE_IMAGE))
+		//throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing end page texture"));
+
+	// end page
+	//if (!endPage.initialize(graphics, 0, 0, 0, &endPageTexture))
+		//throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
+
 	//character type Image
 
 	// characterWalking texture
@@ -1186,7 +1209,8 @@ void Hailo::buffStateCheck()
 
 void Hailo::checkHealth(){
 	if (p1Health <= 0)
-		cout << "game end" << endl;
+		gameStart = 3;
+		//cout << "game end" << endl;
 }
 int Hailo::displayTimer(){
 	if (timer - elapsed_secs > 0){
@@ -1195,7 +1219,8 @@ int Hailo::displayTimer(){
 		return timer - elapsed_secs;
 	}
 	else{
-		paused = true;
+		gameStart = 3;
+		//paused = true;
 		return 0;
 	}
 }
