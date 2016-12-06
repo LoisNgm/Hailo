@@ -121,7 +121,7 @@ private:
 	float buffForEffectTime = 0;
 	int invincibleTime = 0;
 	int buffState = 0;
-	int velocity = 100;
+	int velocity = 200;
 
 
 	//buffing state time for Player 2
@@ -129,7 +129,7 @@ private:
 	float buffForEffectTime2 = 0;
 	int invincibleTime2 = 0;
 	int buffState2 = 0;
-	int velocity2 = 100;
+	int velocity2 = 200;
 
 
 	bool invincibleDoNotIgnore = true;
