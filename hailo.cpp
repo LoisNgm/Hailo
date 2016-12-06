@@ -1505,7 +1505,7 @@ void Hailo::buffStateCheck(Image c, Image cw, int playerNum)
 			if (buffTiming <= 0)
 			{				
 				buffState = 0;
-				invincibleTime = 4;
+				invincibleTime = 0;
 				buffTiming = 5;
 			}			
 		}
@@ -1593,7 +1593,7 @@ void Hailo::buffStateCheck(Image c, Image cw, int playerNum)
 			{
 				characterControl2();
 				buffState2 = 0;
-				invincibleTime2 = 2;
+				invincibleTime2 = 0;
 				buffTiming2 = 5;
 			}
 		}
