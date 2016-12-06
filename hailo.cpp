@@ -39,34 +39,28 @@ void Hailo::initialize(HWND hwnd)
 	
 	Game::initialize(hwnd); // throws GameError
 	
-	importImage();
-	snowAndHailArrayInitialization();
-	
+	importImage();// a method that does importing Image
+	snowAndHailArrayInitialization();//a method that populate array for snow dropping from the sky
+	cloud2.setX(GAME_WIDTH);// setting the position of the second cloud
 	//snowman
-	snowman.setX(GAME_WIDTH / 2 - snowman.getWidth()/2);
-	snowman.setY(GAME_HEIGHT - snowman.getHeight() - 160.0f);
+	snowman.setX(GAME_WIDTH / 2 - snowman.getWidth()/2);// setting snowman at the middle of the screen
+	snowman.setY(GAME_HEIGHT - snowman.getHeight() - 160.0f);// setting the snowman at ground level
+	//animation of snowman
 	snowman.setCurrentFrame(SNOWMAN_START_FRAME);
 	snowman.setFrames(SNOWMAN_START_FRAME, SNOWMAN_END_FRAME);
 	snowman.setFrameDelay(SNOWMAN_ANIMATION_DELAY);
-	
 
-	//characters
-	snow.setY(30);
-	snow.setVisible(false);
-	for (int i = 0; i < (sizeof(snowArrayImage) / sizeof(Image)); i++)
-	{
-		snowArrayImage[i] = snow;
-	}
-	hail.setY(30);
-	hail.setVisible(false);
-	for (int i = 0; i < (sizeof(hailArrayImage) / sizeof(Image)); i++)
-	{
-		hailArrayImage[i] = hail;
-	}
+	snowman_head.setY(GAME_HEIGHT - snowman_head.getHeight() - 160.0f);// setting the snowman head on ground level
+	snowman_head.setVisible(false);// setting the snowman to be invisible.
 
-	hail.setY(30);
-	hail.setVisible(false);
 	
+	//character status symbol
+	fast[0].setVisible(false);
+	minus[0].setVisible(false);
+	slow[0].setVisible(false);
+	fast[1].setVisible(false);
+	minus[1].setVisible(false);
+	slow[1].setVisible(false);
 
 	freeze[0].setVisible(false);
 	freeze[1].setVisible(false);
@@ -125,12 +119,13 @@ void Hailo::initialize(HWND hwnd)
 //=============================================================================
 void Hailo::update()
 {
+	gameTime += frameTime;//using time from game class
 	itemSpawn();
 	//cloud's animation....
 	cloudAnimation();
 	characterWalking.update(frameTime);
 	characterWalking2.update(frameTime);
-	snowman.update(frameTime);
+	rollingSnowBallOfDeath();
 	jumpingMethod();
 	jumpingMethod2();
 	checkHealth();
@@ -193,6 +188,7 @@ void Hailo::render()
 		snow.draw();
 		hail.draw();
 		cloud.draw();
+		cloud2.draw();
 		snow_fast.draw();
 		snow_invicible.draw();
 		snowman.draw();
@@ -255,8 +251,10 @@ void Hailo::render()
 	}
 	if (gameStart == 3)
 	{
-		deleteAll();
+		//deleteAll();
+		
 		initialize(hwnd);
+		paused = true;
 	}
 	graphics->spriteEnd();
 }
@@ -324,31 +322,64 @@ void Hailo::resetAll()
 //spawning hail and snow
 void Hailo::itemSpawn()
 {
-	gameTime += frameTime;//using time from game class
-	srand(time(0));
-	int randomOnType = rand() % 6 + 1;
+	if (repeat == true)
+	{
+		int tempRan = 0;
+		int count = 0;
+		do
+		{
+			for (int i = 0; i < (sizeof(SpawnColumn) / sizeof(int)); i++)
+			{
+				tempRan = randomNum(0, 19);
+				SpawnColumn[i] = tempRan;
+				SpawnTime[i] = randomNum(1, 3);
+				SpawnDropSpeed[i] = randomNum(100, 150);
+				cout << SpawnColumn[i] << endl;
+			}
+			repeat = false;
+			for (int i = 0; i < (sizeof(SpawnColumn) / sizeof(int)); i++)
+			{
+
+				tempRan = SpawnColumn[i];
+				count = i;
+				while (count <= (sizeof(SpawnColumn) / sizeof(int)))
+				{
+					count++;
+					if (SpawnColumn[count] == tempRan)
+					{
+						repeat = true;
+						cout << "duplicate" << endl;
+						break;
+					}
+				}
+			}
+		} while (repeat == true);
+	}
+
 	for (int i = 0; i < (sizeof(snowArrayImage) / sizeof(Image)); i++)// looping through the array
 	{
 		snowArrayImage[i].setDegrees(snowArrayImage[i].getDegrees() + SNOW_ROTATION_RATE);// snow rotating
 		if (snowArrayImage[i].getVisible())
 		{
 
-			snowArrayImage[i].setY(snowArrayImage[i].getY() + frameTime * SNOW_SPEED);//snow travelling downwards
+			snowArrayImage[i].setY(snowArrayImage[i].getY() + frameTime * SpawnDropSpeed[0]);//snow travelling downwards
 
 			if (snowArrayImage[i].getY() > FLOOR)// checking for item out of screen
 			{
 				snowArrayImage[i].setY(30);//reset snow position
 				snowArrayImage[i].setVisible(false);//reuse snow object.
 			}
+
 		}
 		else
 		{
-			if ((gameTime - lastSnowSpawnTime) > SPAWNTIME)
+			if ((gameTime - lastSnowSpawnTime) > SpawnTime[0])
 			{
-				snowArrayImage[i].setX((rand() % 20 + 1) * (GAME_WIDTH / 20) + snowArrayImage[i].getWidth() / 2);
+				snowArrayImage[i].setX(SpawnColumn[0] * (GAME_WIDTH / 19));
 				snowArrayImage[i].setVisible(true);//spawn snow
 				lastSnowSpawnTime = gameTime;//reset spawn time(r)
-				//cout << "Snow: " << snowArrayImage[i].getX() << " , " << snowArrayImage[i].getY() << endl;
+				cout << "Snow: " << snowArrayImage[i].getX() << " , " << snowArrayImage[i].getY() << endl;
+				repeat = true;
 				break;
 			}
 		}
@@ -359,7 +390,7 @@ void Hailo::itemSpawn()
 		if (hailArrayImage[i].getVisible())
 		{
 
-			hailArrayImage[i].setY(hailArrayImage[i].getY() + frameTime * SNOW_SPEED);//hail travelling downwards
+			hailArrayImage[i].setY(hailArrayImage[i].getY() + frameTime * SpawnDropSpeed[1]);//hail travelling downwards
 
 			if (hailArrayImage[i].getY() > FLOOR)// checking for item out of screen
 			{
@@ -370,23 +401,25 @@ void Hailo::itemSpawn()
 		}
 		else
 		{
-			if ((gameTime - lastHailSpawnTime) > SPAWNTIME)
+			if ((gameTime - lastHailSpawnTime) > SpawnTime[1])
 			{
-				hailArrayImage[i].setX((rand() % 20 + 1) * (GAME_WIDTH / 20) + hailArrayImage[i].getWidth() / 2);
+				hailArrayImage[i].setX(SpawnColumn[1] * (GAME_WIDTH / 19));
 				hailArrayImage[i].setVisible(true);//spawn hail
 				lastHailSpawnTime = gameTime;//reset spawn time(r)
-				//cout << "Hail: " << hailArrayImage[i].getX() << " , " << hailArrayImage[i].getY() << endl;
+				cout << "Hail: " << hailArrayImage[i].getX() << " , " << hailArrayImage[i].getY() << endl;
+				repeat = true;
 				break;
 			}
 		}
 	}
+
 	for (int i = 0; i < (sizeof(snow_fastArrayImage) / sizeof(Image)); i++)// looping through the array
 	{
 		snow_fastArrayImage[i].setDegrees(snow_fastArrayImage[i].getDegrees() + SNOW_ROTATION_RATE);// snow_fast rotating
 		if (snow_fastArrayImage[i].getVisible())
 		{
 
-			snow_fastArrayImage[i].setY(snow_fastArrayImage[i].getY() + frameTime * SNOW_SPEED);//snow_fast travelling downwards
+			snow_fastArrayImage[i].setY(snow_fastArrayImage[i].getY() + frameTime * SpawnDropSpeed[2]);//snow_fast travelling downwards
 
 			if (snow_fastArrayImage[i].getY() > FLOOR)// checking for item out of screen
 			{
@@ -397,23 +430,25 @@ void Hailo::itemSpawn()
 		}
 		else
 		{
-			if ((gameTime - lastsnow_fastSpawnTime) > SPAWNTIME)
+			if ((gameTime - lastsnow_fastSpawnTime) > SpawnTime[2])
 			{
-				snow_fastArrayImage[i].setX((rand() % 20 + 1) * (GAME_WIDTH / 20) + snow_fastArrayImage[i].getWidth() / 2);
+				snow_fastArrayImage[i].setX(SpawnColumn[2] * (GAME_WIDTH / 19));
 				snow_fastArrayImage[i].setVisible(true);//spawn snow_fast
 				lastsnow_fastSpawnTime = gameTime;//reset spawn time(r)
-				//cout << "snow_fast: " << snow_fastArrayImage[i].getX() << " , " << snow_fastArrayImage[i].getY() << endl;
+				cout << "snow_fast: " << snow_fastArrayImage[i].getX() << " , " << snow_fastArrayImage[i].getY() << endl;
+				repeat = true;
 				break;
 			}
 		}
 	}
+
 	for (int i = 0; i < (sizeof(snow_invincibleArrayImage) / sizeof(Image)); i++)// looping through the array
 	{
 		snow_invincibleArrayImage[i].setDegrees(snow_invincibleArrayImage[i].getDegrees() + SNOW_ROTATION_RATE);// snow_invincible rotating
 		if (snow_invincibleArrayImage[i].getVisible())
 		{
 
-			snow_invincibleArrayImage[i].setY(snow_invincibleArrayImage[i].getY() + frameTime * SNOW_SPEED);//snow_invincible travelling downwards
+			snow_invincibleArrayImage[i].setY(snow_invincibleArrayImage[i].getY() + frameTime * SpawnDropSpeed[3]);//snow_invincible travelling downwards
 
 			if (snow_invincibleArrayImage[i].getY() > FLOOR)// checking for item out of screen
 			{
@@ -424,12 +459,13 @@ void Hailo::itemSpawn()
 		}
 		else
 		{
-			if ((gameTime - lastsnow_invincibleSpawnTime) > SPAWNTIME)
+			if ((gameTime - lastsnow_invincibleSpawnTime) > SpawnTime[3])
 			{
-				snow_invincibleArrayImage[i].setX((rand() % 20 + 1) * (GAME_WIDTH / 20) + snow_invincibleArrayImage[i].getWidth() / 2);
+				snow_invincibleArrayImage[i].setX(SpawnColumn[3] * (GAME_WIDTH / 19));
 				snow_invincibleArrayImage[i].setVisible(true);//spawn snow_invincible
 				lastsnow_invincibleSpawnTime = gameTime;//reset spawn time(r)
-				//cout << "snow_invincible: " << snow_invincibleArrayImage[i].getX() << " , " << snow_invincibleArrayImage[i].getY() << endl;
+				cout << "snow_invincible: " << snow_invincibleArrayImage[i].getX() << " , " << snow_invincibleArrayImage[i].getY() << endl;
+				repeat = true;
 				break;
 			}
 		}
@@ -440,7 +476,7 @@ void Hailo::itemSpawn()
 		if (snow_minusArrayImage[i].getVisible())
 		{
 
-			snow_minusArrayImage[i].setY(snow_minusArrayImage[i].getY() + frameTime * SNOW_SPEED);//snow_minus travelling downwards
+			snow_minusArrayImage[i].setY(snow_minusArrayImage[i].getY() + frameTime * SpawnDropSpeed[4]);//snow_minus travelling downwards
 
 			if (snow_minusArrayImage[i].getY() > FLOOR)// checking for item out of screen
 			{
@@ -451,12 +487,13 @@ void Hailo::itemSpawn()
 		}
 		else
 		{
-			if ((gameTime - lastsnow_minusSpawnTime) > SPAWNTIME)
+			if ((gameTime - lastsnow_minusSpawnTime) > SpawnTime[4])
 			{
-				snow_minusArrayImage[i].setX((rand() % 20 + 1) * (GAME_WIDTH / 20) + snow_minusArrayImage[i].getWidth() / 2);
+				snow_minusArrayImage[i].setX(SpawnColumn[4] * (GAME_WIDTH / 19));
 				snow_minusArrayImage[i].setVisible(true);//spawn snow_minus
 				lastsnow_minusSpawnTime = gameTime;//reset spawn time(r)
-				//cout << "snow_minus: " << snow_minusArrayImage[i].getX() << " , " << snow_minusArrayImage[i].getY() << endl;
+				cout << "snow_minus: " << snow_minusArrayImage[i].getX() << " , " << snow_minusArrayImage[i].getY() << endl;
+				repeat = true;
 				break;
 			}
 		}
@@ -467,7 +504,7 @@ void Hailo::itemSpawn()
 		if (snow_slowArrayImage[i].getVisible())
 		{
 
-			snow_slowArrayImage[i].setY(snow_slowArrayImage[i].getY() + frameTime * SNOW_SPEED);//snow_slow travelling downwards
+			snow_slowArrayImage[i].setY(snow_slowArrayImage[i].getY() + frameTime * SpawnDropSpeed[5]);//snow_slow travelling downwards
 
 			if (snow_slowArrayImage[i].getY() > FLOOR)// checking for item out of screen
 			{
@@ -478,19 +515,16 @@ void Hailo::itemSpawn()
 		}
 		else
 		{
-			if ((gameTime - lastsnow_slowSpawnTime) > SPAWNTIME)
+			if ((gameTime - lastsnow_slowSpawnTime) > SpawnTime[5])
 			{
-				snow_slowArrayImage[i].setX((rand() % 20 + 1) * (GAME_WIDTH / 20) + snow_slowArrayImage[i].getWidth() / 2);
+				snow_slowArrayImage[i].setX(SpawnColumn[5] * (GAME_WIDTH / 19));
 				snow_slowArrayImage[i].setVisible(true);//spawn snow_slow
 				lastsnow_slowSpawnTime = gameTime;//reset spawn time(r)
-				//cout << "snow_slow: " << snow_slowArrayImage[i].getX() << " , " << snow_slowArrayImage[i].getY() << endl;
+				cout << "snow_slow: " << snow_slowArrayImage[i].getX() << " , " << snow_slowArrayImage[i].getY() << endl;
+				repeat = true;
 				break;
 			}
 		}
-	}
-	for (int i = 0; i < (sizeof(preventSameColumnSpawning) / sizeof(int)); i++)
-	{
-		preventSameColumnSpawning[i] = 0;
 	}
 }
 boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
@@ -864,6 +898,29 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 				PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 				return true;
 			}
+			if (
+				(cw.getX() + cw.getWidth() - 20) >= (snowman_head.getX()) && (cw.getX() + 15) <= (snowman_head.getX() + snowman_head.getWidth()) &&
+				(cw.getY() + cw.getHeight()) >= (snowman_head.getY()) && (cw.getY() + 10) <= (snowman_head.getY() + snowman_head.getHeight()) &&
+				(rollingOfDeath == true) && (snowman_head.getVisible() == true)
+				)
+			{
+				cw.setVisible(false);
+				c.setVisible(true);
+				snowman.setCurrentFrame(snowman.getStartFrame());
+				snowman_head.setVisible(false);
+				snowman_head.setX(GAME_WIDTH / 2 - snowman.getWidth() / 2);
+				rollingOfDeath = false;
+				snowman.setVisible(true);
+				if (playerNum == 1)
+				{
+					p1Health = 0;
+				}
+				if (playerNum == 2)
+				{
+					p2Health = 0;
+				}
+				return true;
+			}
 		}
 
 	}
@@ -879,6 +936,15 @@ void Hailo::cloudAnimation()
 	else
 	{
 		cloud.setX(cloud.getX() + frameTime * CHARACTER_SPEED);
+	}
+	//cloud's animation....
+	if (cloud2.getX() > GAME_WIDTH) // position off screen left
+	{
+		cloud2.setX((float)-cloud2.getWidth());
+	}
+	else
+	{
+		cloud2.setX(cloud2.getX() + frameTime * CHARACTER_SPEED);
 	}
 }
 
@@ -1365,6 +1431,9 @@ void Hailo::importImage()
 	// cloud
 	if (!cloud.initialize(graphics, 0, 0, 0, &cloudTexture))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
+	// cloud2
+	if (!cloud2.initialize(graphics, 0, 0, 0, &cloudTexture))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 
 
 	// fast texture
@@ -1421,42 +1490,61 @@ void Hailo::snowAndHailArrayInitialization()
 	}
 }
 
-int Hailo::getNonDuplicateRanNum()
+void Hailo::rollingSnowBallOfDeath()
 {
-	int tempRan = 0;
-	bool repeat = true;
-	//srand(time(0));
-	do
+	if (snowman.getEndFrame() == snowman.getCurrentFrame())
 	{
-		tempRan = (rand() % 20 + 1);
-		for (int i = 0; i < (sizeof(preventSameColumnSpawning) / sizeof(int)) - 1; i++)
+		rollingOfDeath = true;
+		snowman.setVisible(false);
+
+	}
+	else
+	{
+		direction = randomNum(1, 2);
+		snowman.update(frameTime);
+	}
+	if (rollingOfDeath == true)
+	{
+		if (snowman_head.getVisible())
 		{
-			if (preventSameColumnSpawning[i] != 0)
+			if (snowman_head.getX() < GAME_WIDTH && snowman_head.getX() > 0)
 			{
-				
-				if (preventSameColumnSpawning[i] == tempRan)
+				if (direction == 1)
 				{
-					repeat = true;
-					cout << "Duplicate drop detected." << endl;
-					break;
+					snowman_head.setX(snowman_head.getX() + frameTime * CHARACTER_SPEED);
+					snowman_head.setDegrees(snowman_head.getDegrees() + SNOW_ROTATION_RATE);
 				}
 				else
 				{
-					repeat = false;
-					preventSameColumnSpawning[i+1] = tempRan;
-					cout << "Random: " << tempRan << endl;
-					return tempRan;
+					snowman_head.setX(snowman_head.getX() - frameTime * CHARACTER_SPEED);
+					snowman_head.setDegrees(snowman_head.getDegrees() - SNOW_ROTATION_RATE);
 				}
+
 			}
 			else
 			{
-			    getNonDuplicateRanNum();
-				preventSameColumnSpawning[i] = tempRan;
-				return tempRan;
+				snowman.setCurrentFrame(snowman.getStartFrame());
+				snowman_head.setVisible(false);
+				snowman_head.setX(GAME_WIDTH / 2 - snowman.getWidth() / 2);
+				rollingOfDeath = false;
+				snowman.setVisible(true);
+				snowman_head.update(frameTime);
 			}
 		}
-	} while (repeat);	
+		else
+		{
+			snowman_head.setX(GAME_WIDTH / 2 - snowman.getWidth() / 2);
+			snowman_head.setVisible(true);
+
+		}
+	}
 }
+int Hailo::randomNum(int from, int to)
+{
+	int randnum = rand() % to + from;
+	return randnum;
+}
+
 void Hailo::buffStateCheck(Image c, Image cw, int playerNum)
 {
 	if (playerNum == 1)
@@ -1638,7 +1726,7 @@ void Hailo::buffStateCheck(Image c, Image cw, int playerNum)
 }
 
 void Hailo::checkHealth(){
-	if (p1Health <= 0)
+	if (p1Health <= 0|| p2Health <= 0)
 		cout << "game end" << endl;
 }
 int Hailo::displayTimer(){
