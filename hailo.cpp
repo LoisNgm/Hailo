@@ -233,29 +233,22 @@ void Hailo::render()
 		const int BUF_SIZE = 50;
 		static char buffer[BUF_SIZE];
 
-		//dxFontSmall->setFontColor(graphicsNS::BLACK);
-		//dxFontMedium->setFontColor(graphicsNS::BLACK);
 		dxFontMedium->setFontColor(graphicsNS::WHITE);
 		dxFontMedium->print(to_string(displayTimer()), 500, GAME_HEIGHT - 100);
-		//dxFontLarge->print("C", 20, 100);
-		//dxFontMedium->print("C", 114, 148);
-		//dxFontSmall->print("C", 164, 184);
 		dxFont.setFontColor(gameNS::FONT_COLOR);
-		// convert score to Cstring
 
 		_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
 		dxFont.print(buffer, 100, GAME_HEIGHT - 100);
 
 		_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
 		dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
-		//_snprintf_s(buffer, BUF_SIZE, "P2\nScore: %d\n Health: %d");
-		//dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 	}
-	if (gameStart == 3)
+	if (gameStart == 2)
 	{
-		initialize(hwnd);
-		paused = true;
-		gameStart = 0;
+		endPage.draw();
+		if (input->isKeyDown(VK_ESCAPE)){
+			PostQuitMessage(0);
+		}
 	}
 	graphics->spriteEnd();
 }
@@ -282,6 +275,7 @@ void Hailo::releaseAll()
 	snow_minusTexture.onLostDevice();
 	snow_slowTexture.onLostDevice();
 	startPageTexture.onLostDevice();
+	endPageTexture.onLostDevice();
 	fastTexture.onLostDevice();
 	// Release the sound object.
 	if (sounds)
@@ -317,6 +311,7 @@ void Hailo::resetAll()
 	snow_minusTexture.onResetDevice();
 	snow_slowTexture.onResetDevice();
 	startPageTexture.onResetDevice();
+	endPageTexture.onResetDevice();
 	Game::resetAll();
     return;
 }
@@ -1431,6 +1426,13 @@ void Hailo::importImage()
 	if (!fast[1].initialize(graphics, 0, 0, 0, &fastTexture))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 
+	// end page texture
+	if (!endPageTexture.initialize(graphics, END_PAGE_IMAGE))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing end page texture"));
+
+	// end page
+	if (!endPage.initialize(graphics, 0, 0, 0, &endPageTexture))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 }
 
 void Hailo::snowAndHailArrayInitialization()
@@ -1710,8 +1712,10 @@ void Hailo::buffStateCheck(Image c, Image cw, int playerNum)
 }
 
 void Hailo::checkHealth(){
-	if (p1Health <= 0|| p2Health <= 0)
-		cout << "game end" << endl;
+	if (p1Health <= 0 || p2Health <= 0){
+		PlaySound(TEXT("sounds\\game_over.wav"), NULL, SND_ASYNC);
+		gameStart = 2;
+	}
 }
 int Hailo::displayTimer(){
 	if (timer - elapsed_secs > 0){
@@ -1720,9 +1724,9 @@ int Hailo::displayTimer(){
 		return timer - elapsed_secs;
 	}
 	else{
-		gameStart = 3;
-		paused = true;
-		return 0;	
+		gameStart = 2;
+		PlaySound(TEXT("sounds\\game_over.wav"), NULL, SND_ASYNC);
+		return 0;
 	}
 }
 bool Hailo::checkingCollision(Image image1, Image image2)

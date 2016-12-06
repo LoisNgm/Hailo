@@ -51,6 +51,7 @@ const char SNOW_SLOW_IMAGE[] = "pictures\\snow_slow.png";//snow_slow
 
 // start_page
 const char START_PAGE_IMAGE[] = "pictures\\start_page.png";
+const char END_PAGE_IMAGE[] = "pictures\\end_page.png";
 
 // window
 const char CLASS_NAME[] = "Hailo";
