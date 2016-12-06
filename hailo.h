@@ -8,6 +8,7 @@
 #include "image.h"
 #include <ctime>
 #include "textDX.h"
+#include "sounds.h"
 
 //=============================================================================
 // Create game class
@@ -92,6 +93,8 @@ private:
 	bool enableKey = true;
 	bool stateOfUp = false;
 	bool stateOfDown = false;
+	bool stateOfUpJump = false;
+	bool stateOfDownJump = false;
 	int countDownKey = 0;
 	bool freezeState = false;
 	float unfreezeTimer = 0;
@@ -144,6 +147,9 @@ private:
 	int gameStart = 0;
 	clock_t begin;
 	clock_t end;
+
+	// sounds
+	Sounds* sounds;
 
 public:
     // Constructor
