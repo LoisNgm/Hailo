@@ -13,6 +13,8 @@ Hailo::Hailo()
 	dxFontSmall = new TextDX();     // DirectX fonts
 	dxFontMedium = new TextDX();
 	dxFontLarge = new TextDX();
+
+	sounds = 0;
 }
 
 //=============================================================================
@@ -96,7 +98,21 @@ void Hailo::initialize(HWND hwnd)
 
 	if (dxFont.initialize(graphics, gameNS::POINT_SIZE, false, false, gameNS::FONT) == false)
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Failed to initialize DirectX font."));
-	
+
+	// Create the sound object.
+	sounds = new Sounds;
+	if (!sounds)
+	{
+		return;
+	}
+
+	// Initialize the sound object.
+	bool result = sounds->Initialize(hwnd);
+	if (!result)
+	{
+		MessageBox(hwnd, "Could not initialize Direct Sound.", "Error", MB_OK);
+		return;
+	}
     return;
 }
 //=============================================================================
@@ -234,6 +250,11 @@ void Hailo::render()
 		//_snprintf_s(buffer, BUF_SIZE, "P2\nScore: %d\n Health: %d");
 		//dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 	}
+	if (gameStart == 3)
+	{
+		deleteAll();
+		initialize(hwnd);
+	}
 	graphics->spriteEnd();
 }
 
@@ -260,6 +281,13 @@ void Hailo::releaseAll()
 	snow_slowTexture.onLostDevice();
 	startPageTexture.onLostDevice();
 	fastTexture.onLostDevice();
+	// Release the sound object.
+	if (sounds)
+	{
+		sounds->Shutdown();
+		delete sounds;
+		sounds = 0;
+	}
     Game::releaseAll();
     return;
 }
@@ -489,6 +517,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 
 			snowArrayImage[i].setY(30);//reset snow position
 			snowArrayImage[i].setVisible(false);//reuse snow object.
+			PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 			return true;
 		}
 		// c walking and snow
@@ -514,6 +543,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 			}
 			snowArrayImage[i].setY(30);//reset snow position
 			snowArrayImage[i].setVisible(false);//reuse snow object.
+			PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 			return true;
 		}
 		if (buffState != 2&& playerNum==1) 		
@@ -529,6 +559,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 					freezeState = true;				
 				hailArrayImage[i].setY(30);//reset hail position
 				hailArrayImage[i].setVisible(false);//reuse hail object.
+				PlaySound(TEXT("sounds\\hail.wav"), NULL, SND_ASYNC);
 				return true;
 			}
 			// c walking and hail
@@ -547,6 +578,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 				}
 				hailArrayImage[i].setY(30);//reset hail position
 				hailArrayImage[i].setVisible(false);//reuse hail object.
+				PlaySound(TEXT("sounds\\hail.wav"), NULL, SND_ASYNC);
 				return true;
 			}
 			//Colliding with downgrades
@@ -571,7 +603,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 				minus[playerNum-1].setVisible(false);
 				cw.setVisible(false);
 				c.setVisible(true);
-			
+				PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 				return true;
 			}
 			// c walking and slow speed snow 
@@ -592,7 +624,8 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 				snow_slowArrayImage[i].setY(30);
 				snow_slowArrayImage[i].setVisible(false);
 				fast[playerNum - 1].setVisible(false);
-				minus[playerNum-1].setVisible(false);
+				minus[playerNum - 1].setVisible(false);
+				PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 				return true;
 			}
 
@@ -614,6 +647,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 					buffState = 4;
 					buffTiming = 5;
 				}
+				PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 				return true;
 			}
 			// c walking and minus snowball
@@ -742,7 +776,8 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 				fast[playerNum - 1].setVisible(false);
 				minus[playerNum - 1].setVisible(true);			
 				buffState2 = 4;
-				buffTiming2 = 5;				
+				buffTiming2 = 5;
+				PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 				return true;
 			}
 		}
@@ -773,6 +808,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 			slow[playerNum - 1].setVisible(false);
 			fast[playerNum - 1].setVisible(false);
 			minus[playerNum - 1].setVisible(false);
+			PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 			return true;
 		}
 		// c walking and invincible
@@ -801,6 +837,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 			slow[playerNum - 1].setVisible(false);
 			minus[playerNum - 1].setVisible(false);
 			fast[playerNum - 1].setVisible(false);
+			PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 			return true;
 		}
 
@@ -831,6 +868,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 			slow[playerNum - 1].setVisible(false);
 			fast[playerNum - 1].setVisible(true);
 			minus[playerNum - 1].setVisible(false);
+			PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 			return true;
 		}
 		// c walking and speed increase snowball
@@ -859,6 +897,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 			slow[playerNum - 1].setVisible(false);
 			fast[playerNum - 1].setVisible(true);
 			minus[playerNum - 1].setVisible(false);
+			PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 			return true;
 		}
 	}
@@ -922,13 +961,17 @@ void Hailo::characterControl()
 	{
 		jumping = true;					//to trigger jump
 		input->clearKeyPress(VK_UP);
+		stateOfDownJump = true;
 	}
-	if (input->isKeyDown(VK_UP))             // if jump
+	if (!input->isKeyDown(VK_DOWN) && stateOfDownJump == true)
 	{
-		jumping = true;					//to trigger jump
+		stateOfDownJump = false;
+		PlaySound(TEXT("sounds\\jump.wav"), NULL, SND_ASYNC);
 	}
-	characterWalking.update(frameTime);
-
+	else
+	{
+		characterWalking.update(frameTime);
+	}
 }
 void Hailo::characterControl2()
 { //Character player 2
@@ -1654,6 +1697,7 @@ int Hailo::displayTimer(){
 		return timer - elapsed_secs;
 	}
 	else{
+		gameStart = 3;
 		paused = true;
 		return 0;
 	}
