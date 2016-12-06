@@ -15,9 +15,7 @@ using namespace std;
 //=============================================================================
 Hailo::Hailo()
 {
-	dxFontSmall = new TextDX();     // DirectX fonts
 	dxFontMedium = new TextDX();
-	dxFontLarge = new TextDX();
 
 	sounds = 0;
 }
@@ -83,19 +81,13 @@ void Hailo::initialize(HWND hwnd)
 	character2.setVisible(true);
 
 
-	// 15 pixel high Arial
-	if (dxFontSmall->initialize(graphics, 15, true, false, "Arial") == false)
-		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing DirectX font"));
-
-	// 62 pixel high Arial
 	if (dxFontMedium->initialize(graphics, 62, true, false, "Calibri") == false)
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing DirectX font"));
 
-	// 124 pixel high Arial
-	if (dxFontLarge->initialize(graphics, 124, true, false, "Calibri") == false)
-		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing DirectX font"));
-
 	if (dxFont.initialize(graphics, gameNS::POINT_SIZE, false, false, gameNS::FONT) == false)
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Failed to initialize DirectX font."));
+
+	if (dxFont2.initialize(graphics, gameNS::POINT_SIZE, false, false, gameNS::FONT) == false)
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Failed to initialize DirectX font."));
 
 	// Create the sound object.
@@ -236,23 +228,57 @@ void Hailo::render()
 		dxFontMedium->setFontColor(graphicsNS::WHITE);
 		dxFontMedium->print(to_string(displayTimer()), 500, GAME_HEIGHT - 100);
 		dxFont.setFontColor(gameNS::FONT_COLOR);
+		dxFont2.setFontColor(gameNS::FONT_COLOR);
 
 		_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
 		dxFont.print(buffer, 100, GAME_HEIGHT - 100);
 
 		_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
-		dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
+		dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 	}
 	if (gameStart == 2)
 	{
 		paused = true;
 		endPage.draw();
-
-		_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
-		dxFont.print(buffer, 100, GAME_HEIGHT - 100);
-
-		_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
-		dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
+		if ((timer - elapsed_secs) == 0)
+		{
+			if (p1Score > p2Score){
+				dxFont2.setFontColor(gameNS::FONT_COLOR_LOSE);
+				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
+				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
+				dxFont.setFontColor(gameNS::FONT_COLOR_WIN);
+				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
+				dxFont.print(buffer, 100, GAME_HEIGHT - 100);
+			}
+			else
+			{
+				dxFont.setFontColor(gameNS::FONT_COLOR_LOSE);
+				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
+				dxFont.print(buffer, 100, GAME_HEIGHT - 100);
+				dxFont2.setFontColor(gameNS::FONT_COLOR_WIN);
+				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
+				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
+			}
+		}
+		else
+		{
+			if (p1Health > p2Health){
+				dxFont2.setFontColor(gameNS::FONT_COLOR_LOSE);
+				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
+				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
+				dxFont.setFontColor(gameNS::FONT_COLOR_WIN);
+				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
+				dxFont.print(buffer, 100, GAME_HEIGHT - 100);
+			}
+			if (p1Health < p2Health){
+				dxFont.setFontColor(gameNS::FONT_COLOR_LOSE);
+				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
+				dxFont.print(buffer, 100, GAME_HEIGHT - 100);
+				dxFont2.setFontColor(gameNS::FONT_COLOR_WIN);
+				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
+				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
+			}
+		}
 		if (input->isKeyDown(VK_ESCAPE)){
 			PostQuitMessage(0);
 		}
