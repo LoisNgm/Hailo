@@ -251,8 +251,6 @@ void Hailo::render()
 	}
 	if (gameStart == 3)
 	{
-		//deleteAll();
-		
 		initialize(hwnd);
 		paused = true;
 	}
@@ -736,6 +734,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 					p1Health--;
 					enableKey = false;
 					freezeState = true;
+					unfreezeTimer = gameTime;
 				}
 				else
 				{
@@ -743,6 +742,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 					p2Health--;
 					enableKey2 = false;
 					freezeState2 = true;
+					unfreezeTimer2 = gameTime;
 				}
 				hailArrayImage[i].setY(30);//reset hail position
 				hailArrayImage[i].setVisible(false);//reuse hail object.
@@ -760,13 +760,15 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 					p1Health--;
 					enableKey = false;
 					freezeState = true;				
+					unfreezeTimer = gameTime;
 				}
 				else
 				{
 					p2Score -= rand() % 51 + 50;
 					p2Health--;
 					enableKey2 = false;
-					freezeState2 = true;					
+					freezeState2 = true;	
+					unfreezeTimer2 = gameTime;
 				}
 				hailArrayImage[i].setY(30);//reset hail position
 				hailArrayImage[i].setVisible(false);//reuse hail object.
