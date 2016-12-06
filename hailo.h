@@ -45,7 +45,10 @@ private:
 	//start page
 	TextureManager startPageTexture;
 	Image   startPage;
-	
+
+	//end page
+	TextureManager endPageTexture;
+	Image   endPage;
 
 	TextureManager cloudTexture;
 	Image cloud;
