@@ -538,22 +538,23 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 			(c.getX() + 15) <= (snowArrayImage[i].getX() + snowArrayImage[i].getWidth()) &&
 			(c.getY() + c.getHeight()) >= (snowArrayImage[i].getY()) &&
 			(c.getY() + 10) <= (snowArrayImage[i].getY() + snowArrayImage[i].getHeight())){
-			if (buffState == 4)
+			if (buffState == 4 && playerNum == 1)
 			{
 				p1Score -= (rand() % 100 + 1);
 			}
-			else
+			else if (buffState != 4 && playerNum == 1)
 			{
 				p1Score += (rand() % 100 + 1);
 			}
-			if (buffState2 == 4)
+			else if (buffState2 == 4 && playerNum == 2)
 			{
 				p2Score -= (rand() % 100 + 1);
 			}
-			else
+			else if (buffState2 != 4 && playerNum == 2)
 			{
 				p2Score += (rand() % 100 + 1);
 			}
+			
 
 			snowArrayImage[i].setY(30);//reset snow position
 			snowArrayImage[i].setVisible(false);//reuse snow object.
@@ -565,19 +566,19 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 			(cw.getX() + 15) <= (snowArrayImage[i].getX() + snowArrayImage[i].getWidth()) &&
 			(cw.getY() + cw.getHeight()) >= (snowArrayImage[i].getY()) &&
 			(cw.getY() + 10) <= (snowArrayImage[i].getY() + snowArrayImage[i].getHeight())){
-			if (buffState == 4)
+			if (buffState == 4&&playerNum==1)
 			{
 				p1Score -= (rand() % 100 + 1);
 			}
-			else
+			else if(buffState != 4 && playerNum == 1)
 			{
 				p1Score += (rand() % 100 + 1);
 			}
-			if (buffState2 == 4)
+			else if (buffState2 == 4 && playerNum == 2)
 			{
 				p2Score -= (rand() % 100 + 1);
 			}
-			else
+			else if (buffState2 != 4 && playerNum == 2)
 			{
 				p2Score += (rand() % 100 + 1);
 			}
@@ -696,19 +697,11 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 			return true;
 		}
 
-		if (buffState == 2 && playerNum == 1)
+		if ((buffState == 2 && playerNum == 1)||(buffState2 == 2 && playerNum == 2))
 		{
 			invincibleDoNotIgnore = false;
 		}
-		else if (buffState != 2 && playerNum == 1)
-		{
-			invincibleDoNotIgnore = true;
-		}
-		else if (buffState2 == 2 && playerNum == 2)
-		{
-			invincibleDoNotIgnore = false;
-		}
-		else if (buffState2 != 2 && playerNum == 2)
+		else if ((buffState2 != 2 && playerNum == 2)||(buffState != 2 && playerNum == 1))
 		{
 			invincibleDoNotIgnore = true;
 		}
