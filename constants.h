@@ -111,5 +111,6 @@ const float SNOWMAN_ANIMATION_DELAY = 0.3f; // time between frames of SNOWMAN an
 const int  SNOWMAN_COLS = 4;                // SNOWMAN texture has 1 columns
 const int  SNOWMAN_WIDTH = 114;              // width of SNOWMAN image
 const int  SNOWMAN_HEIGHT = 127;             // height of SNOWMAN image
+const int SPEED_ROLLING_OF_DEATH = 200;
 
 #endif

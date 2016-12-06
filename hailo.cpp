@@ -1504,12 +1504,12 @@ void Hailo::rollingSnowBallOfDeath()
 			{
 				if (direction == 1)
 				{
-					snowman_head.setX(snowman_head.getX() + frameTime * CHARACTER_SPEED);
+					snowman_head.setX(snowman_head.getX() + frameTime * SPEED_ROLLING_OF_DEATH);
 					snowman_head.setDegrees(snowman_head.getDegrees() + SNOW_ROTATION_RATE);
 				}
 				else
 				{
-					snowman_head.setX(snowman_head.getX() - frameTime * CHARACTER_SPEED);
+					snowman_head.setX(snowman_head.getX() - frameTime * SPEED_ROLLING_OF_DEATH);
 					snowman_head.setDegrees(snowman_head.getDegrees() - SNOW_ROTATION_RATE);
 				}
 
