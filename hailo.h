@@ -21,10 +21,8 @@
 class Hailo : public Game
 {
 private:
-	// game items	
-	TextDX  *dxFontSmall;       // DirectX fonts
+	// game items
 	TextDX  *dxFontMedium;
-	TextDX  *dxFontLarge;
     // variables
 	//character player 2
 	TextureManager characterTexture;
