@@ -49,6 +49,7 @@ private:
 
 	TextureManager cloudTexture;
 	Image cloud;
+	Image cloud2;
 
 	//Dropping item
 	TextureManager hailTexture;
@@ -139,8 +140,13 @@ private:
 	Image snow_invincibleArrayImage[20];
 	Image snow_minusArrayImage[20];
 	Image snow_slowArrayImage[20];
-	int preventSameColumnSpawning[6];
-		
+	int SpawnColumn[6];
+	int SpawnTime[6];
+	int SpawnDropSpeed[6];
+	bool repeat = true;
+	bool rollingOfDeath = false;
+	int direction;
+
 	//health and score for player 1
 	int p1Score;
 	int p1Health = 3;
@@ -149,7 +155,7 @@ private:
 	int p2Score;
 	int p2Health = 3;
 
-	int timer = 60;
+	int timer = 1;
 	int elapsed_secs = 0;
 
 	int gameStart = 0;
@@ -185,12 +191,13 @@ public:
 	void unfreeze(int playerNum, Image c);
 	void importImage();
 	void snowAndHailArrayInitialization();
-	int getNonDuplicateRanNum();
 	int displayTimer();
 	void checkHealth();
 	void buffStateCheck(Image c, Image cw, int playerNum);
 	void jumpingMethod2();
 	bool checkingCollision(Image image1, Image image2);
+	void rollingSnowBallOfDeath();
+	int randomNum(int from, int to);
 };
 #endif
 

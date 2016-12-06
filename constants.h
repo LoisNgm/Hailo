@@ -45,7 +45,7 @@ const char SLOW_IMAGE[] = "pictures\\slow.png";//slow
 const char SNOW_FAST_IMAGE[] = "pictures\\snow_fast.png";//snow_fast
 const char SNOW_INVINCIBLE_IMAGE[] = "pictures\\snow_invincible.png";//snow_invincible
 const char SNOWMAN_IMAGE[] = "pictures\\snowman.png";//snowman
-const char SNOWMAN_HEAD_IMAGE[] = "pictures\\snowman_head.png";//snowman_head
+const char SNOWMAN_HEAD_IMAGE[] = "pictures\\Mr_Snowman_Head_1.png";//snowman_head
 const char SNOW_MINUS_IMAGE[] = "pictures\\snow_minus.png";//snow_minus
 const char SNOW_SLOW_IMAGE[] = "pictures\\snow_slow.png";//snow_slow
 
