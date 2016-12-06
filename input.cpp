@@ -64,7 +64,6 @@ void Input::initialize(HWND hwnd, bool capture)
         Rid[0].dwFlags = RIDEV_INPUTSINK;   
         Rid[0].hwndTarget = hwnd;
         RegisterRawInputDevices(Rid, 1, sizeof(Rid[0]));
-
         if(mouseCaptured)
             SetCapture(hwnd);           // capture mouse
 

@@ -122,6 +122,7 @@ private:
 	int buffState = 0;
 	int velocity = 100;
 
+
 	//buffing state time for Player 2
 	int buffTiming2 = 5;
 	float buffForEffectTime2 = 0;
@@ -129,6 +130,8 @@ private:
 	int buffState2 = 0;
 	int velocity2 = 100;
 
+
+	bool invincibleDoNotIgnore = true;
 	//arrays for snow
 	Image snowArrayImage[20];
 	Image hailArrayImage[20];
@@ -176,7 +179,8 @@ public:
 	void cloudAnimation();
 	void characterControl();
 	void characterControl2();
-	void frozen(Image c, Image cw, int playerNum);
+	void frozen();
+	void frozen2();
 	void jumpingMethod();
 	void unfreeze(int playerNum, Image c);
 	void importImage();
@@ -186,6 +190,7 @@ public:
 	void checkHealth();
 	void buffStateCheck(Image c, Image cw, int playerNum);
 	void jumpingMethod2();
+	bool checkingCollision(Image image1, Image image2);
 };
 #endif
 
