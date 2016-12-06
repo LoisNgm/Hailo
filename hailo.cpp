@@ -173,6 +173,8 @@ void Hailo::collisions()
 //=============================================================================
 void Hailo::render()
 {
+	const int BUF_SIZE = 50;
+	static char buffer[BUF_SIZE];
 	graphics->spriteBegin();                // begin drawing sprites
 	if (gameStart == 0){		
 		startPage.draw();
@@ -230,8 +232,6 @@ void Hailo::render()
 		minus[1].draw();
 		slow[1].draw();
 		fast[1].draw();
-		const int BUF_SIZE = 50;
-		static char buffer[BUF_SIZE];
 
 		dxFontMedium->setFontColor(graphicsNS::WHITE);
 		dxFontMedium->print(to_string(displayTimer()), 500, GAME_HEIGHT - 100);
@@ -245,7 +245,14 @@ void Hailo::render()
 	}
 	if (gameStart == 2)
 	{
+		paused = true;
 		endPage.draw();
+
+		_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
+		dxFont.print(buffer, 100, GAME_HEIGHT - 100);
+
+		_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
+		dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 		if (input->isKeyDown(VK_ESCAPE)){
 			PostQuitMessage(0);
 		}
@@ -1724,8 +1731,8 @@ int Hailo::displayTimer(){
 		return timer - elapsed_secs;
 	}
 	else{
-		gameStart = 2;
 		PlaySound(TEXT("sounds\\game_over.wav"), NULL, SND_ASYNC);
+		gameStart = 2;
 		return 0;
 	}
 }
