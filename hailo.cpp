@@ -231,7 +231,7 @@ void Hailo::render()
 		minus[1].draw();
 		slow[1].draw();
 		fast[1].draw();
-		const int BUF_SIZE = 20;
+		const int BUF_SIZE = 50;
 		static char buffer[BUF_SIZE];
 
 		//dxFontSmall->setFontColor(graphicsNS::BLACK);
@@ -244,8 +244,11 @@ void Hailo::render()
 		dxFont.setFontColor(gameNS::FONT_COLOR);
 		// convert score to Cstring
 
-		_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d", (int)p1Health);
+		_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
 		dxFont.print(buffer, 100, GAME_HEIGHT - 100);
+
+		_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
+		dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 		//_snprintf_s(buffer, BUF_SIZE, "P2\nScore: %d\n Health: %d");
 		//dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 	}

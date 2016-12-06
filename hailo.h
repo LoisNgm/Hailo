@@ -155,7 +155,7 @@ private:
 	int p2Score;
 	int p2Health = 3;
 
-	int timer = 1;
+	int timer = 60;
 	int elapsed_secs = 0;
 
 	int gameStart = 0;
