@@ -173,18 +173,19 @@ void Hailo::collisions()
 //=============================================================================
 void Hailo::render()
 {
+	const int BUF_SIZE = 50;
+	static char buffer[BUF_SIZE];
 	graphics->spriteBegin();                // begin drawing sprites
-	if (gameStart == 0){
+	if (gameStart == 0){		
 		startPage.draw();
 		if (input->anyKeyPressed()){
 			begin = clock();
 			gameStart = 1;
-			paused = false;
+			paused = false;					
 		}
 	}
 	else if (gameStart == 1){
 		background.draw();
-
 		snow.draw();
 		hail.draw();
 		cloud.draw();
@@ -231,30 +232,30 @@ void Hailo::render()
 		minus[1].draw();
 		slow[1].draw();
 		fast[1].draw();
-		const int BUF_SIZE = 20;
-		static char buffer[BUF_SIZE];
 
-		//dxFontSmall->setFontColor(graphicsNS::BLACK);
-		//dxFontMedium->setFontColor(graphicsNS::BLACK);
 		dxFontMedium->setFontColor(graphicsNS::WHITE);
 		dxFontMedium->print(to_string(displayTimer()), 500, GAME_HEIGHT - 100);
-		//dxFontLarge->print("C", 20, 100);
-		//dxFontMedium->print("C", 114, 148);
-		//dxFontSmall->print("C", 164, 184);
 		dxFont.setFontColor(gameNS::FONT_COLOR);
-		// convert score to Cstring
 
-		_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d", (int)p1Health);
+		_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
 		dxFont.print(buffer, 100, GAME_HEIGHT - 100);
-		//_snprintf_s(buffer, BUF_SIZE, "P2\nScore: %d\n Health: %d");
-		//dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
+
+		_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
+		dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 	}
-	if (gameStart == 3)
+	if (gameStart == 2)
 	{
-		//deleteAll();
-		
-		initialize(hwnd);
 		paused = true;
+		endPage.draw();
+
+		_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
+		dxFont.print(buffer, 100, GAME_HEIGHT - 100);
+
+		_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
+		dxFont.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
+		if (input->isKeyDown(VK_ESCAPE)){
+			PostQuitMessage(0);
+		}
 	}
 	graphics->spriteEnd();
 }
@@ -281,6 +282,7 @@ void Hailo::releaseAll()
 	snow_minusTexture.onLostDevice();
 	snow_slowTexture.onLostDevice();
 	startPageTexture.onLostDevice();
+	endPageTexture.onLostDevice();
 	fastTexture.onLostDevice();
 	// Release the sound object.
 	if (sounds)
@@ -316,6 +318,7 @@ void Hailo::resetAll()
 	snow_minusTexture.onResetDevice();
 	snow_slowTexture.onResetDevice();
 	startPageTexture.onResetDevice();
+	endPageTexture.onResetDevice();
 	Game::resetAll();
     return;
 }
@@ -592,22 +595,19 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 			{
 				buffTiming = 5;
 				buffState = 1;
-				velocity = 200;
+				velocity = 400;
 				buffForEffectTime = gameTime;
-				fast[playerNum - 1].setVisible(true);
-				slow[playerNum - 1].setVisible(false);
-				minus[playerNum - 1].setVisible(false);
 			}
 			else if (playerNum == 2)
 			{
 				buffTiming2 = 5;
 				buffState2 = 1;
-				velocity2 = 200;
+				velocity2 = 400;
 				buffForEffectTime2 = gameTime;
-				fast[playerNum - 1].setVisible(true);
-				slow[playerNum - 1].setVisible(false);
-				minus[playerNum - 1].setVisible(false);
 			}
+			fast[playerNum - 1].setVisible(true);
+			slow[playerNum - 1].setVisible(false);
+			minus[playerNum - 1].setVisible(false);
 			snow_fastArrayImage[i].setY(30);
 			snow_fastArrayImage[i].setVisible(false);
 			PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
@@ -621,24 +621,20 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 			if (playerNum == 1)
 			{
 				buffState = 1;
-				velocity = 200;
+				velocity = 400;
 				buffTiming = 5;
 				buffForEffectTime = gameTime;
-				slow[playerNum - 1].setVisible(false);
-				fast[playerNum - 1].setVisible(true);
-				minus[playerNum - 1].setVisible(false);
 			}
 			else
 			{
 				buffState2 = 1;
-				velocity2 = 200;
+				velocity2 = 400;
 				buffTiming2 = 5;
 				buffForEffectTime2 = gameTime;
-				slow[playerNum - 1].setVisible(false);
-				fast[playerNum - 1].setVisible(true);
-				minus[playerNum - 1].setVisible(false);
 			}
-
+			slow[playerNum - 1].setVisible(false);
+			fast[playerNum - 1].setVisible(true);
+			minus[playerNum - 1].setVisible(false);
 			snow_fastArrayImage[i].setY(30);
 			snow_fastArrayImage[i].setVisible(false);
 
@@ -656,22 +652,19 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 			{
 				buffTiming = 5;
 				buffState = 2;
-				velocity = 100;
-				buffForEffectTime = gameTime;
-				slow[playerNum - 1].setVisible(false);
-				fast[playerNum - 1].setVisible(false);
-				minus[playerNum - 1].setVisible(false);
+				velocity = 200;
+				buffForEffectTime = gameTime;		
 			}
 			else if (playerNum == 2)
 			{
 				buffTiming2 = 5;
 				buffState2 = 2;
-				velocity2 = 100;
+				velocity2 = 200;
 				buffForEffectTime2 = gameTime;
-				slow[playerNum - 1].setVisible(false);
-				fast[playerNum - 1].setVisible(false);
-				minus[playerNum - 1].setVisible(false);
 			}
+			slow[playerNum - 1].setVisible(false);
+			fast[playerNum - 1].setVisible(false);
+			minus[playerNum - 1].setVisible(false);
 			PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 			return true;
 		}
@@ -687,21 +680,18 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 				buffState = 2;
 				buffTiming = 5;
 				buffForEffectTime = gameTime;
-				velocity = 100;
-				slow[playerNum - 1].setVisible(false);
-				fast[playerNum - 1].setVisible(false);
-				minus[playerNum - 1].setVisible(false);
+				velocity = 200;
 			}
 			if (playerNum == 2)
 			{
 				buffState2 = 2;
 				buffTiming2 = 5;
 				buffForEffectTime2 = gameTime;
-				velocity2 = 100;
-				slow[playerNum - 1].setVisible(false);
-				fast[playerNum - 1].setVisible(false);
-				minus[playerNum - 1].setVisible(false);
+				velocity2 = 200;
 			}
+			slow[playerNum - 1].setVisible(false);
+			fast[playerNum - 1].setVisible(false);
+			minus[playerNum - 1].setVisible(false);
 			PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 			return true;
 		}
@@ -736,6 +726,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 					p1Health--;
 					enableKey = false;
 					freezeState = true;
+					unfreezeTimer = gameTime;
 				}
 				else
 				{
@@ -743,6 +734,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 					p2Health--;
 					enableKey2 = false;
 					freezeState2 = true;
+					unfreezeTimer2 = gameTime;					
 				}
 				hailArrayImage[i].setY(30);//reset hail position
 				hailArrayImage[i].setVisible(false);//reuse hail object.
@@ -760,13 +752,15 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 					p1Health--;
 					enableKey = false;
 					freezeState = true;				
+					unfreezeTimer = gameTime;
 				}
 				else
 				{
 					p2Score -= rand() % 51 + 50;
 					p2Health--;
 					enableKey2 = false;
-					freezeState2 = true;					
+					freezeState2 = true;	
+					unfreezeTimer2 = gameTime;
 				}
 				hailArrayImage[i].setY(30);//reset hail position
 				hailArrayImage[i].setVisible(false);//reuse hail object.
@@ -786,22 +780,19 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 				{
 					buffForEffectTime = gameTime;
 					buffState = 3;
-					velocity = 50;
-					buffTiming = 5;
-					fast[playerNum - 1].setVisible(false);
-					minus[playerNum - 1].setVisible(false);
-					slow[playerNum - 1].setVisible(true);					
+					velocity = 100;
+					buffTiming = 5;				
 				}
 				else if (playerNum == 2)
 				{
 					buffForEffectTime2 = gameTime;
 					buffState2 = 3;
-					velocity2 = 50;
+					velocity2 = 100;
 					buffTiming2 = 5;
-					fast[playerNum - 1].setVisible(false);
-					minus[playerNum - 1].setVisible(false);
-					slow[playerNum - 1].setVisible(true);
 				}	
+				fast[playerNum - 1].setVisible(false);
+				minus[playerNum - 1].setVisible(false);
+				slow[playerNum - 1].setVisible(true);
 				PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 				return true;
 			}
@@ -816,23 +807,19 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 				{
 					buffForEffectTime = gameTime;
 					buffState = 3;
-					velocity = 50;
-					buffTiming = 5;
-					fast[playerNum - 1].setVisible(false);
-					minus[playerNum - 1].setVisible(false);
-					slow[playerNum - 1].setVisible(true);
+					velocity = 100;
+					buffTiming = 5;;
 				}
 				else if (playerNum == 2)
 				{
 					buffForEffectTime2 = gameTime;
 					buffState2 = 3;
-					velocity2 = 50;
+					velocity2 = 100;
 					buffTiming2 = 5;
-					fast[playerNum - 1].setVisible(false);
-					minus[playerNum - 1].setVisible(false);
-					slow[playerNum - 1].setVisible(true);
 				}
-				PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
+				fast[playerNum - 1].setVisible(false);
+				minus[playerNum - 1].setVisible(false);
+				slow[playerNum - 1].setVisible(true);
 				PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 				return true;
 			}
@@ -850,21 +837,18 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 					buffState = 4;
 					buffTiming = 5;
 					buffForEffectTime = gameTime;
-					velocity = 100;
-					slow[playerNum - 1].setVisible(false);
-					fast[playerNum - 1].setVisible(false);
-					minus[playerNum - 1].setVisible(true);
+					velocity = 200;
 				}
 				else if(playerNum == 2)
 				{
 					buffState2 = 4;
 					buffTiming2 = 5;
 					buffForEffectTime2 = gameTime;
-					velocity2 = 100;
-					slow[playerNum - 1].setVisible(false);
-					fast[playerNum - 1].setVisible(false);
-					minus[playerNum - 1].setVisible(true);
+					velocity2 = 200;
 				}
+				slow[playerNum - 1].setVisible(false);
+				fast[playerNum - 1].setVisible(false);
+				minus[playerNum - 1].setVisible(true);
 				PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 				return true;
 			}
@@ -880,9 +864,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 					buffForEffectTime = gameTime;
 					snow_minusArrayImage[i].setY(30);
 					snow_minusArrayImage[i].setVisible(false);
-					slow[playerNum - 1].setVisible(false);
-					fast[playerNum - 1].setVisible(false);
-					minus[playerNum - 1].setVisible(true);
+					velocity = 200;
 				}
 				else if (playerNum == 2)
 				{
@@ -891,10 +873,13 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 					buffForEffectTime2 = gameTime;
 					snow_minusArrayImage[i].setY(30);
 					snow_minusArrayImage[i].setVisible(false);
+					velocity2 = 200;
+				}
+
 					slow[playerNum - 1].setVisible(false);
 					fast[playerNum - 1].setVisible(false);
 					minus[playerNum - 1].setVisible(true);
-				}
+				
 				PlaySound(TEXT("sounds\\collect.wav"), NULL, SND_ASYNC);
 				return true;
 			}
@@ -950,7 +935,6 @@ void Hailo::cloudAnimation()
 
 void Hailo::characterControl()
 {
-
 	if (input->isKeyDown(VK_RIGHT))            // if move right
 	{
 
@@ -962,10 +946,11 @@ void Hailo::characterControl()
 		{
 			character.setVisible(false);
 			characterWalking.setVisible(true);
-			character.setX(character.getX() + frameTime * velocity);
+	     	character.setX(character.getX() + frameTime * velocity);
 			characterWalking.flipHorizontal(false);
 			characterWalking.setX(character.getX() + frameTime * velocity);
 			characterWalking.update(frameTime);
+	
 		}
 	}
 	else{
@@ -980,11 +965,12 @@ void Hailo::characterControl()
 		}
 		else
 		{
+			
 			character.setVisible(false);
 			characterWalking.setVisible(true);
+			characterWalking.flipHorizontal(true);			
 			character.setX(character.getX() - frameTime * velocity);
-			characterWalking.flipHorizontal(true);
-			characterWalking.setX(character.getX() - frameTime * velocity);
+			characterWalking.setX(character.getX() - frameTime * velocity);						
 			characterWalking.update(frameTime);
 		}
 	}
@@ -1447,6 +1433,13 @@ void Hailo::importImage()
 	if (!fast[1].initialize(graphics, 0, 0, 0, &fastTexture))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 
+	// end page texture
+	if (!endPageTexture.initialize(graphics, END_PAGE_IMAGE))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing end page texture"));
+
+	// end page
+	if (!endPage.initialize(graphics, 0, 0, 0, &endPageTexture))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 }
 
 void Hailo::snowAndHailArrayInitialization()
@@ -1562,7 +1555,7 @@ void Hailo::buffStateCheck(Image c, Image cw, int playerNum)
 			if (buffTiming <= 0)
 			{
 				buffState = 0;
-				velocity = 100;
+				velocity = 200;
 				fast[playerNum - 1].setVisible(false);
 				buffTiming = 5;
 			}
@@ -1612,7 +1605,7 @@ void Hailo::buffStateCheck(Image c, Image cw, int playerNum)
 			{
 				slow[playerNum - 1].setVisible(false);
 				buffState = 0;
-				velocity = 100;
+				velocity = 200;
 				buffTiming = 5;
 			}
 		}
@@ -1651,7 +1644,7 @@ void Hailo::buffStateCheck(Image c, Image cw, int playerNum)
 			if (buffTiming2 <= 0)
 			{
 				buffState2 = 0;
-				velocity2 = 100;
+				velocity2 = 200;
 				fast[playerNum - 1].setVisible(false);
 				buffTiming2 = 5;
 			}
@@ -1700,7 +1693,7 @@ void Hailo::buffStateCheck(Image c, Image cw, int playerNum)
 			{
 				slow[playerNum - 1].setVisible(false);
 				buffState2 = 0;
-				velocity2 = 100;
+				velocity2 = 200;
 				buffTiming2 = 5;
 			}
 		}
@@ -1726,8 +1719,10 @@ void Hailo::buffStateCheck(Image c, Image cw, int playerNum)
 }
 
 void Hailo::checkHealth(){
-	if (p1Health <= 0|| p2Health <= 0)
-		cout << "game end" << endl;
+	if (p1Health <= 0 || p2Health <= 0){
+		PlaySound(TEXT("sounds\\game_over.wav"), NULL, SND_ASYNC);
+		gameStart = 2;
+	}
 }
 int Hailo::displayTimer(){
 	if (timer - elapsed_secs > 0){
@@ -1736,8 +1731,8 @@ int Hailo::displayTimer(){
 		return timer - elapsed_secs;
 	}
 	else{
-		gameStart = 3;
-		paused = true;
+		PlaySound(TEXT("sounds\\game_over.wav"), NULL, SND_ASYNC);
+		gameStart = 2;
 		return 0;
 	}
 }

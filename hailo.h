@@ -45,7 +45,10 @@ private:
 	//start page
 	TextureManager startPageTexture;
 	Image   startPage;
-	
+
+	//end page
+	TextureManager endPageTexture;
+	Image   endPage;
 
 	TextureManager cloudTexture;
 	Image cloud;
@@ -121,7 +124,7 @@ private:
 	float buffForEffectTime = 0;
 	int invincibleTime = 0;
 	int buffState = 0;
-	int velocity = 100;
+	int velocity = 200;
 
 
 	//buffing state time for Player 2
@@ -129,7 +132,7 @@ private:
 	float buffForEffectTime2 = 0;
 	int invincibleTime2 = 0;
 	int buffState2 = 0;
-	int velocity2 = 100;
+	int velocity2 = 200;
 
 
 	bool invincibleDoNotIgnore = true;
@@ -155,7 +158,7 @@ private:
 	int p2Score;
 	int p2Health = 3;
 
-	int timer = 1;
+	int timer = 60;
 	int elapsed_secs = 0;
 
 	int gameStart = 0;
