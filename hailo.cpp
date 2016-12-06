@@ -335,7 +335,7 @@ void Hailo::itemSpawn()
 			{
 				tempRan = randomNum(0, 19);
 				SpawnColumn[i] = tempRan;
-				SpawnTime[i] = randomNum(1, 3);
+				SpawnTime[i] = randomNum(5, 8);
 				SpawnDropSpeed[i] = randomNum(100, 150);
 				cout << SpawnColumn[i] << endl;
 			}
@@ -376,9 +376,9 @@ void Hailo::itemSpawn()
 		}
 		else
 		{
-			if ((gameTime - lastSnowSpawnTime) > SpawnTime[0])
+			if ((gameTime - lastSnowSpawnTime) > RandomFloat(0.4f, 0.7f))
 			{
-				snowArrayImage[i].setX(SpawnColumn[0] * (GAME_WIDTH / 19));
+				snowArrayImage[i].setX(randomNum(0, 19) * (GAME_WIDTH / 19));
 				snowArrayImage[i].setVisible(true);//spawn snow
 				lastSnowSpawnTime = gameTime;//reset spawn time(r)
 				cout << "Snow: " << snowArrayImage[i].getX() << " , " << snowArrayImage[i].getY() << endl;
@@ -1749,4 +1749,10 @@ bool Hailo::checkingCollision(Image image1, Image image2)
 	{
 		return false;
 	}
+}
+float Hailo::RandomFloat(float a, float b) {
+	float random = ((float)rand()) / (float)RAND_MAX;
+	float diff = b - a;
+	float r = random * diff;
+	return a + r;
 }

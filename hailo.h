@@ -201,6 +201,7 @@ public:
 	bool checkingCollision(Image image1, Image image2);
 	void rollingSnowBallOfDeath();
 	int randomNum(int from, int to);
+	float RandomFloat(float a, float b);
 };
 #endif
 
