@@ -9,6 +9,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include "game.h"
+#include "highscore.h"
 #include "textureManager.h"
 #include "image.h"
 #include <ctime>
@@ -165,6 +166,9 @@ private:
 
 	// sounds
 	Sounds* sounds;
+
+	//highscore 
+	Highscore* highscoreObj;
 
 public:
     // Constructor

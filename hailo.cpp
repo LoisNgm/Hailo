@@ -5,8 +5,8 @@
 //  Student Number:     S10158786C			| S10156827G				| S10157119D
 
 #include "hailo.h"
-#include <iostream>
 #include <time.h> 
+#include <fstream>
 
 using namespace std;
 
@@ -16,8 +16,8 @@ using namespace std;
 Hailo::Hailo()
 {
 	dxFontMedium = new TextDX();
-
 	sounds = 0;
+	highscoreObj = new Highscore();
 }
 
 //=============================================================================
@@ -35,7 +35,7 @@ Hailo::~Hailo()
 void Hailo::initialize(HWND hwnd)
 {
 	
-	Game::initialize(hwnd); // throws GameError
+	Game::initialize(hwnd); // throws GameError	
 	
 	importImage();// a method that does importing Image
 	snowAndHailArrayInitialization();//a method that populate array for snow dropping from the sky
@@ -146,7 +146,7 @@ void Hailo::update()
 //=============================================================================
 void Hailo::ai()
 {
-	
+	//testing
 }
 
 //=============================================================================
@@ -168,13 +168,27 @@ void Hailo::render()
 	const int BUF_SIZE = 50;
 	static char buffer[BUF_SIZE];
 	graphics->spriteBegin();                // begin drawing sprites
-	if (gameStart == 0){		
-		startPage.draw();
-		if (input->anyKeyPressed()){
-			begin = clock();
-			gameStart = 1;
-			paused = false;					
+	if (gameStart == 0){			
+		if (!highscoreObj->getDisplayStatus())
+		{			
+			startPage.draw();
+			if (input->isKeyDown(VK_KEY_1)){
+				begin = clock();
+				gameStart = 1;
+				paused = false;
+			}
+			else if (input->isKeyDown(VK_KEY_2)){
+				highscoreObj->setDisplayStatus(true);
+			}
 		}
+		else
+		{
+			highscoreObj->draw();
+			if (input->anyKeyPressed())
+			{
+				highscoreObj->setDisplayStatus(false);
+			}
+		}		
 	}
 	else if (gameStart == 1){
 		background.draw();
@@ -279,6 +293,7 @@ void Hailo::render()
 				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 			}
 		}
+		highscoreObj->setScores(p1Score, p2Score);
 		if (input->isKeyDown(VK_ESCAPE)){
 			PostQuitMessage(0);
 		}
@@ -1268,6 +1283,11 @@ void Hailo::importImage()
 	// start page
 	if (!startPage.initialize(graphics, 0, 0, 0, &startPageTexture))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
+
+	//highscore page
+	// Initialize the highscore page.
+	highscoreObj->initialize(graphics);
+
 	//character type Image
 	//PLAYER 1
 	// characterWalking texture
@@ -1746,10 +1766,11 @@ void Hailo::checkHealth(){
 int Hailo::displayTimer(){
 	if (timer - elapsed_secs > 0){
 		end = clock();
-		elapsed_secs = int(end - begin) / CLOCKS_PER_SEC;
+		elapsed_secs = int(end - begin) / CLOCKS_PER_SEC;	
 		return timer - elapsed_secs;
 	}
 	else{
+
 		PlaySound(TEXT("sounds\\game_over.wav"), NULL, SND_ASYNC);
 		gameStart = 2;
 		return 0;

@@ -15,6 +15,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="gameError.h" />
     <ClInclude Include="graphics.h" />
+    <ClInclude Include="highscore.h" />
     <ClInclude Include="image.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="hailo.h" />
@@ -25,6 +26,7 @@
   <ItemGroup>
     <ClCompile Include="game.cpp" />
     <ClCompile Include="graphics.cpp" />
+    <ClCompile Include="highscore.cpp" />
     <ClCompile Include="image.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="hailo.cpp" />
