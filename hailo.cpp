@@ -168,7 +168,7 @@ void Hailo::render()
 	const int BUF_SIZE = 50;
 	static char buffer[BUF_SIZE];
 	graphics->spriteBegin();                // begin drawing sprites
-	if (input->wasKeyPressed(0x43))
+	if (input->wasKeyPressed(0x33))
 	{
 		gameStart = 3; 
 		input->clearAll();
@@ -184,7 +184,7 @@ void Hailo::render()
 	}
 	if (gameStart == 0){		
 		startPage.draw();
-		if (input->isKeyDown(0x50))
+		if (input->isKeyDown(0x31))
 		{
 			begin = clock();
 			gameStart = 1;
