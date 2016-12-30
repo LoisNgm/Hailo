@@ -48,6 +48,10 @@ private:
 	TextureManager endPageTexture;
 	Image   endPage;
 
+	//credit page
+	TextureManager creditPageTexture;
+	Image   creditPage;
+
 	TextureManager cloudTexture;
 	Image cloud;
 	Image cloud2;
@@ -163,6 +167,7 @@ private:
 	clock_t begin;
 	clock_t end;
 
+	bool pause;
 	// sounds
 	Sounds* sounds;
 
@@ -200,6 +205,7 @@ public:
 	void rollingSnowBallOfDeath();
 	int randomNum(int from, int to);
 	float RandomFloat(float a, float b);
+	void resetAllItems();
 };
 #endif
 

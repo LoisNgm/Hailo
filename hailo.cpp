@@ -168,9 +168,24 @@ void Hailo::render()
 	const int BUF_SIZE = 50;
 	static char buffer[BUF_SIZE];
 	graphics->spriteBegin();                // begin drawing sprites
+	if (input->wasKeyPressed(0x43))
+	{
+		gameStart = 3; 
+		input->clearAll();
+	}
+	if (gameStart == 3)
+	{
+		creditPage.draw();
+		if (input->anyKeyPressed())
+		{
+			gameStart = 0;
+			input->clearAll();
+		}
+	}
 	if (gameStart == 0){		
 		startPage.draw();
-		if (input->anyKeyPressed()){
+		if (input->isKeyDown(0x50))
+		{
 			begin = clock();
 			gameStart = 1;
 			paused = false;					
@@ -278,10 +293,21 @@ void Hailo::render()
 				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
 				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 			}
-		}
-		if (input->isKeyDown(VK_ESCAPE)){
+			
+			if (input->isKeyDown(VK_ESCAPE)){
+
 			PostQuitMessage(0);
+			}
+
+			if (input->isKeyDown(0x52))
+			{
+				gameStart = 0;
+				resetAllItems();
+				input->clearAll();
+			}
 		}
+		
+		
 	}
 	graphics->spriteEnd();
 }
@@ -1459,6 +1485,14 @@ void Hailo::importImage()
 	// end page
 	if (!endPage.initialize(graphics, 0, 0, 0, &endPageTexture))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
+
+	// credit page texture
+	if (!creditPageTexture.initialize(graphics, CREDIT_PAGE_IMAGE))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing credit page texture"));
+
+	//credit page
+	if (!creditPage.initialize(graphics, 0, 0, 0, &creditPageTexture))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 }
 
 void Hailo::snowAndHailArrayInitialization()
@@ -1774,4 +1808,73 @@ float Hailo::RandomFloat(float a, float b) {
 	float diff = b - a;
 	float r = random * diff;
 	return a + r;
+}
+
+void Hailo::resetAllItems()
+{
+	p1Health = 3;
+	p2Health = 3;
+	p1Score = 0;
+	p2Score = 0;
+	for (int i = 0; i < (sizeof(snow_slowArrayImage) / sizeof(Image)); i++)
+	{
+		snow_slowArrayImage[i].setY(30);
+		snow_slowArrayImage[i].setVisible(false);
+		snowArrayImage[i].setY(30);
+		snowArrayImage[i].setVisible(false);
+		hailArrayImage[i].setY(30);
+		hailArrayImage[i].setVisible(false);
+		snow_fastArrayImage[i].setY(30);
+		snow_fastArrayImage[i].setVisible(false);
+		snow_invincibleArrayImage[i].setY(30);
+		snow_invincibleArrayImage[i].setVisible(false);
+		snow_minusArrayImage[i].setY(30);
+		snow_minusArrayImage[i].setVisible(false);
+	}
+	character.setX(0);
+	character2.setX(0);
+	characterWalking.setX(0);
+	characterWalking2.setX(0);
+
+	JumpTimer = 0;
+	jumping = false;
+	increasingYAxisJump = true;
+	enableKey = true;
+	stateOfUp = false;
+	stateOfDown = false;
+	stateOfUpJump = false;
+	stateOfDownJump = false;
+	countDownKey = 0;
+	freezeState = false;
+	unfreezeTimer = 0;
+
+	JumpTimer2 = 0;
+	jumping2 = false;
+	increasingYAxisJump2 = true;
+	enableKey2 = true;
+	stateOfUp2 = false;
+	stateOfDown2 = false;
+	countDownKey2 = 0;
+	freezeState2 = false;
+	unfreezeTimer2 = 0;
+
+	buffTiming = 5;
+	buffForEffectTime = 0;
+	invincibleTime = 0;
+	buffState = 0;
+	velocity = 200;
+
+	buffTiming2 = 5;
+	buffForEffectTime2 = 0;
+	invincibleTime2 = 0;
+	buffState2 = 0;
+	velocity2 = 200;
+	invincibleDoNotIgnore = true;
+	for (int i = 0; i < 2; i++)
+	{
+		freeze[i].setVisible(false);
+		minus[i].setVisible(false);
+		fast[i].setVisible(false);
+		slow[i].setVisible(false);
+	}
 }
