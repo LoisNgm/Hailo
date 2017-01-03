@@ -14,7 +14,7 @@
 #include <ctime>
 #include "textDX.h"
 #include "sounds.h"
-
+using namespace std;
 //=============================================================================
 // Create game class
 //=============================================================================
@@ -47,6 +47,10 @@ private:
 	//end page
 	TextureManager endPageTexture;
 	Image   endPage;
+
+	//credit page
+	TextureManager creditPageTexture;
+	Image   creditPage;
 
 	TextureManager cloudTexture;
 	Image cloud;
@@ -155,6 +159,13 @@ private:
 	//health and score for player 2
 	int p2Score;
 	int p2Health = 30;
+	string p1Name;
+	bool Name1Enter = false;
+	//health and score for player 2
+	int p2Score;
+	int p2Health = 3;
+	string p2Name;
+	bool Name2Enter = false;
 
 	int timer = 60;
 	int elapsed_secs = 0;
@@ -200,6 +211,7 @@ public:
 	void rollingSnowBallOfDeath();
 	int randomNum(int from, int to);
 	float RandomFloat(float a, float b);
+	void resetAllItems();
 };
 #endif
 

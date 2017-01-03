@@ -7,7 +7,6 @@
 #include "hailo.h"
 #include <iostream>
 #include <time.h> 
-
 using namespace std;
 
 //=============================================================================
@@ -16,7 +15,7 @@ using namespace std;
 Hailo::Hailo()
 {
 	dxFontMedium = new TextDX();
-
+	
 	sounds = 0;
 }
 
@@ -168,15 +167,70 @@ void Hailo::render()
 	const int BUF_SIZE = 50;
 	static char buffer[BUF_SIZE];
 	graphics->spriteBegin();                // begin drawing sprites
-	if (gameStart == 0){		
-		startPage.draw();
-		if (input->anyKeyPressed()){
-			begin = clock();
-			gameStart = 1;
-			paused = false;					
+	
+	if (input->wasKeyPressed(0x33))
+	{
+		gameStart = 3;
+		input->clearAll();
+	}
+	if (gameStart == 3)
+	{
+		creditPage.draw();
+		if (input->anyKeyPressed())
+		{
+			gameStart = 0;
+			input->clearAll();
 		}
 	}
+	if (gameStart == 0){
+		startPage.draw();
+		dxFontMedium->setFontColor(graphicsNS::CYAN);
+		if (Name1Enter == false)
+		{
+			dxFontMedium->print("Enter Player1's Name:", 250, GAME_HEIGHT - 100);
+		}
+		else
+		{
+			if (Name2Enter == false && Name1Enter)
+			{
+				dxFontMedium->print("Enter Player2's Name:", 250, GAME_HEIGHT - 100);
+			}
+			if (Name1Enter && Name2Enter)
+			{
+				dxFontMedium->print("Press Enter to Start", 300, GAME_HEIGHT - 100);
+			}
+		}
+		
+			if (input->isKeyDown(VK_RETURN) && Name1Enter == false)
+			{
+				p1Name = input->getTextIn();
+				Name1Enter = true;
+				input->clearAll();
+			}
+			_snprintf_s(buffer, BUF_SIZE, "%s", p1Name.c_str());
+			dxFont.print(buffer, 100, GAME_HEIGHT - 100);
+			if (input->wasKeyPressed(VK_RETURN) && Name2Enter == false && Name1Enter == true)
+			{
+				p2Name = input->getTextIn();
+				Name2Enter = true;
+				input->clearAll();
+			}
+			_snprintf_s(buffer, BUF_SIZE, "%s", p2Name.c_str());
+			dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
+			if (input->wasKeyPressed(VK_RETURN) && Name2Enter == true && Name1Enter == true)
+			{
+				gameStart = 1;
+			}
+			if (input->isKeyDown(0x31))
+			{
+				begin = clock();
+				gameStart = 1;
+				paused = false;
+			}
+	}
 	else if (gameStart == 1){
+		begin = clock();
+		paused = false;
 		background.draw();
 		snow.draw();
 		hail.draw();
@@ -229,11 +283,11 @@ void Hailo::render()
 		dxFontMedium->print(to_string(displayTimer()), 500, GAME_HEIGHT - 100);
 		dxFont.setFontColor(gameNS::FONT_COLOR);
 		dxFont2.setFontColor(gameNS::FONT_COLOR);
-
-		_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
+		
+		_snprintf_s(buffer, BUF_SIZE, "%s\nHealth: %d\nScore: %d" ,p1Name.c_str(), (int)p1Health, (int)p1Score);
 		dxFont.print(buffer, 100, GAME_HEIGHT - 100);
 
-		_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
+		_snprintf_s(buffer, BUF_SIZE, "%s\nHealth: %d\nScore: %d",p2Name.c_str(), (int)p2Health, (int)p2Score);
 		dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 	}
 	if (gameStart == 2)
@@ -282,10 +336,87 @@ void Hailo::render()
 		if (input->isKeyDown(VK_ESCAPE)){
 			PostQuitMessage(0);
 		}
+		if (input->isKeyDown(0x52))
+		{
+			gameStart = 0;
+			resetAllItems();
+			input->clearAll();
+		}
 	}
 	graphics->spriteEnd();
 }
+void Hailo::resetAllItems()
+{
+	p1Health = 3;
+	p2Health = 3;
+	p1Score = 0;
+	p2Score = 0;
+	for (int i = 0; i < (sizeof(snow_slowArrayImage) / sizeof(Image)); i++)
+	{
+		snow_slowArrayImage[i].setY(30);
+		snow_slowArrayImage[i].setVisible(false);
+		snowArrayImage[i].setY(30);
+		snowArrayImage[i].setVisible(false);
+		hailArrayImage[i].setY(30);
+		hailArrayImage[i].setVisible(false);
+		snow_fastArrayImage[i].setY(30);
+		snow_fastArrayImage[i].setVisible(false);
+		snow_invincibleArrayImage[i].setY(30);
+		snow_invincibleArrayImage[i].setVisible(false);
+		snow_minusArrayImage[i].setY(30);
+		snow_minusArrayImage[i].setVisible(false);
+	}
+	character.setX(0);
+	character2.setX(0);
+	characterWalking.setX(0);
+	characterWalking2.setX(0);
 
+	JumpTimer = 0;
+	jumping = false;
+	increasingYAxisJump = true;
+	enableKey = true;
+	stateOfUp = false;
+	stateOfDown = false;
+	stateOfUpJump = false;
+	stateOfDownJump = false;
+	countDownKey = 0;
+	freezeState = false;
+	unfreezeTimer = 0;
+
+	JumpTimer2 = 0;
+	jumping2 = false;
+	increasingYAxisJump2 = true;
+	enableKey2 = true;
+	stateOfUp2 = false;
+	stateOfDown2 = false;
+	countDownKey2 = 0;
+	freezeState2 = false;
+	unfreezeTimer2 = 0;
+
+	buffTiming = 5;
+	buffForEffectTime = 0;
+	invincibleTime = 0;
+	buffState = 0;
+	velocity = 200;
+
+	buffTiming2 = 5;
+	buffForEffectTime2 = 0;
+	invincibleTime2 = 0;
+	buffState2 = 0;
+	velocity2 = 200;
+	invincibleDoNotIgnore = true;
+	for (int i = 0; i < 2; i++)
+	{
+		freeze[i].setVisible(false);
+		minus[i].setVisible(false);
+		fast[i].setVisible(false);
+		slow[i].setVisible(false);
+	}
+	p1Name = "";
+	p2Name = "";
+	Name1Enter = false;
+	Name2Enter = false;
+}
 //=============================================================================
 // The graphics device was lost.
 // Release all reserved video memory so graphics device may be reset.
@@ -1267,6 +1398,13 @@ void Hailo::importImage()
 
 	// start page
 	if (!startPage.initialize(graphics, 0, 0, 0, &startPageTexture))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
+	// credit page texture
+	if (!creditPageTexture.initialize(graphics, CREDIT_PAGE_IMAGE))
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing credit page texture"));
+
+	//credit page
+	if (!creditPage.initialize(graphics, 0, 0, 0, &creditPageTexture))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
 	//character type Image
 	//PLAYER 1
