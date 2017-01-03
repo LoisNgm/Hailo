@@ -19,6 +19,7 @@ private:
 	COLOR_ARGB  color;          // font color (a,r,g,b)
 	LP_DXFONT   dxFont;
 	LP_DXFONT   dxFont2;
+	LP_DXFONT   dxFontLarge;
 	RECT        fontRect;       // text rectangle
 	// matrix to rotate the text
 	D3DXMATRIX  matrix;
