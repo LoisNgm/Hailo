@@ -162,8 +162,6 @@ private:
 	string p1Name;
 	bool Name1Enter = false;
 	//health and score for player 2
-	int p2Score;
-	int p2Health = 3;
 	string p2Name;
 	bool Name2Enter = false;
 
