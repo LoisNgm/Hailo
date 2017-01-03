@@ -244,19 +244,19 @@ void Hailo::render()
 		{
 			if (p1Score > p2Score){
 				dxFont2.setFontColor(gameNS::FONT_COLOR_LOSE);
-				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
+				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d + %d", (int)p2Health, (int)p2Score, (int)(p2Health * 50));
 				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 				dxFont.setFontColor(gameNS::FONT_COLOR_WIN);
-				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
+				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d + %d", (int)p1Health, (int)p1Score, (int)(p1Health * 50));
 				dxFont.print(buffer, 100, GAME_HEIGHT - 100);
 			}
 			else
 			{
 				dxFont.setFontColor(gameNS::FONT_COLOR_LOSE);
-				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
+				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d + %d", (int)p1Health, (int)p1Score, (int)(p1Health * 50));
 				dxFont.print(buffer, 100, GAME_HEIGHT - 100);
 				dxFont2.setFontColor(gameNS::FONT_COLOR_WIN);
-				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
+				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d + %d", (int)p2Health, (int)p2Score, (int)(p1Health * 50));
 				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 			}
 		}
@@ -264,18 +264,18 @@ void Hailo::render()
 		{
 			if (p1Health > p2Health){
 				dxFont2.setFontColor(gameNS::FONT_COLOR_LOSE);
-				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
+				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d + %d", (int)p2Health, (int)p2Score, (int)(p2Health * 50));
 				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 				dxFont.setFontColor(gameNS::FONT_COLOR_WIN);
-				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
+				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d + %d", (int)p1Health, (int)p1Score, (int)(p1Health * 50));
 				dxFont.print(buffer, 100, GAME_HEIGHT - 100);
 			}
 			if (p1Health < p2Health){
 				dxFont.setFontColor(gameNS::FONT_COLOR_LOSE);
-				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d", (int)p1Health, (int)p1Score);
+				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d + %d", (int)p1Health, (int)p1Score, (int)(p1Health * 50));
 				dxFont.print(buffer, 100, GAME_HEIGHT - 100);
 				dxFont2.setFontColor(gameNS::FONT_COLOR_WIN);
-				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d", (int)p2Health, (int)p2Score);
+				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d + %d", (int)p2Health, (int)p2Score, (int)(p2Health * 50));
 				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 			}
 		}
@@ -566,19 +566,19 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 			(c.getY() + 10) <= (snowArrayImage[i].getY() + snowArrayImage[i].getHeight())){
 			if (buffState == 4 && playerNum == 1)
 			{
-				p1Score -= (rand() % 100 + 1);
+				p1Score -= 100;
 			}
 			else if (buffState != 4 && playerNum == 1)
 			{
-				p1Score += (rand() % 100 + 1);
+				p1Score += 100;
 			}
 			else if (buffState2 == 4 && playerNum == 2)
 			{
-				p2Score -= (rand() % 100 + 1);
+				p2Score -= 100;
 			}
 			else if (buffState2 != 4 && playerNum == 2)
 			{
-				p2Score += (rand() % 100 + 1);
+				p2Score += 100;
 			}
 			
 
@@ -594,19 +594,19 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 			(cw.getY() + 10) <= (snowArrayImage[i].getY() + snowArrayImage[i].getHeight())){
 			if (buffState == 4&&playerNum==1)
 			{
-				p1Score -= (rand() % 100 + 1);
+				p1Score -= 100;
 			}
 			else if(buffState != 4 && playerNum == 1)
 			{
-				p1Score += (rand() % 100 + 1);
+				p1Score += 100;
 			}
 			else if (buffState2 == 4 && playerNum == 2)
 			{
-				p2Score -= (rand() % 100 + 1);
+				p2Score -= 100;
 			}
 			else if (buffState2 != 4 && playerNum == 2)
 			{
-				p2Score += (rand() % 100 + 1);
+				p2Score += 100;
 			}
 			snowArrayImage[i].setY(30);//reset snow position
 			snowArrayImage[i].setVisible(false);//reuse snow object.
@@ -741,7 +741,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 				(c.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
 				if (playerNum == 1)
 				{
-					p1Score -= rand() % 51 + 50;
+					p1Score -= 50;
 					p1Health--;
 					enableKey = false;
 					freezeState = true;
@@ -749,7 +749,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 				}
 				else
 				{
-					p2Score -= rand() % 51 + 50;
+					p2Score -= 50;
 					p2Health--;
 					enableKey2 = false;
 					freezeState2 = true;
@@ -767,7 +767,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 				(cw.getY() + 10) <= (hailArrayImage[i].getY() + hailArrayImage[i].getHeight())){
 				if (playerNum == 1)
 				{
-					p1Score -= rand() % 51 + 50;
+					p1Score -= 50;
 					p1Health--;
 					enableKey = false;
 					freezeState = true;				
@@ -775,7 +775,7 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 				}
 				else
 				{
-					p2Score -= rand() % 51 + 50;
+					p2Score -= 50;
 					p2Health--;
 					enableKey2 = false;
 					freezeState2 = true;	
@@ -917,11 +917,11 @@ boolean Hailo::collisionDetection(Image c, Image cw, int playerNum)
 				snowman.setVisible(true);
 				if (playerNum == 1)
 				{
-					p1Health = 0;
+					p1Health -= 3;
 				}
 				if (playerNum == 2)
 				{
-					p2Health = 0;
+					p2Health -= 3;
 				}
 				return true;
 			}

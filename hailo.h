@@ -150,11 +150,11 @@ private:
 
 	//health and score for player 1
 	int p1Score;
-	int p1Health = 3;
+	int p1Health = 30;
 
 	//health and score for player 2
 	int p2Score;
-	int p2Health = 3;
+	int p2Health = 30;
 
 	int timer = 60;
 	int elapsed_secs = 0;
