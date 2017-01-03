@@ -52,6 +52,7 @@ const char SNOW_SLOW_IMAGE[] = "pictures\\snow_slow.png";//snow_slow
 // start_page
 const char START_PAGE_IMAGE[] = "pictures\\start_page.png";
 const char END_PAGE_IMAGE[] = "pictures\\end_page.png";
+const char CREDIT_PAGE_IMAGE[] = "pictures\\credits.png";
 
 // highscore_page
 const char HIGHSCORE_PAGE_IMAGE[] = "pictures\\highscore.png";
