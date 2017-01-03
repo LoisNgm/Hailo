@@ -45,6 +45,9 @@
     <ClInclude Include="sounds.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="highscore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cpp">
@@ -72,6 +75,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sounds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="highscore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

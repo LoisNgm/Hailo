@@ -54,6 +54,9 @@ const char START_PAGE_IMAGE[] = "pictures\\start_page.png";
 const char END_PAGE_IMAGE[] = "pictures\\end_page.png";
 const char CREDIT_PAGE_IMAGE[] = "pictures\\credits.png";
 
+// highscore_page
+const char HIGHSCORE_PAGE_IMAGE[] = "pictures\\highscore.png";
+
 // window
 const char CLASS_NAME[] = "Hailo";
 const char GAME_TITLE[] = "Hailo";
@@ -61,7 +64,7 @@ const bool FULLSCREEN = false;             // windowed or fullscreen
 const UINT GAME_WIDTH =  1028;               // width of game in pixels
 const UINT GAME_HEIGHT = 768;               // height of game in pixels
 
-
+const int numOfTopScore = 11;
  
 // game
 const double PI = 3.14159265;
@@ -77,6 +80,9 @@ const float SNOW_SPAWNTIME = 2.0f;
 const UCHAR ESC_KEY      = VK_ESCAPE;   // escape key
 const UCHAR ALT_KEY      = VK_MENU;     // Alt key
 const UCHAR ENTER_KEY    = VK_RETURN;   // Enter key
+const UCHAR VK_KEY_1	 = 0x31;
+const UCHAR VK_KEY_2	 = 0x32;
+
 
 const int FLOOR = 585;
 const int SNOW_ROTATION_RATE = 5;

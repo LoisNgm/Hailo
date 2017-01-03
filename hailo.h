@@ -9,6 +9,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include "game.h"
+#include "highscore.h"
 #include "textureManager.h"
 #include "image.h"
 #include <ctime>
@@ -159,10 +160,11 @@ private:
 	//health and score for player 2
 	int p2Score;
 	int p2Health = 30;
-	string p1Name;
 	bool Name1Enter = false;
 	//health and score for player 2
-	string p2Name;
+	string p1Name = "";
+
+	string p2Name = "";
 	bool Name2Enter = false;
 
 	int timer = 60;
@@ -174,6 +176,9 @@ private:
 
 	// sounds
 	Sounds* sounds;
+
+	//highscore 
+	Highscore* highscoreObj;
 
 public:
     // Constructor
