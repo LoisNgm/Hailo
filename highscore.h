@@ -23,8 +23,7 @@ class Highscore
 {
 private:
 	bool displaying;
-	vector<string> highscoreName;
-	//string *highscoreName = new string[numOfTopScore];
+	string *scoreName = new string[numOfTopScore];
 	TextureManager highscoreTexture;
 	Image highscore;
 	TextDX* dxFontForScore;
@@ -34,12 +33,12 @@ public:
 	virtual void draw();
 	virtual void initialize(Graphics *graphics);
 	void getScores();
-	void setScores(int p1score, int p2score);
+	void setScores(int p1score, int p2score, string p1name, string p2name);
 	void display();
 	void disableDisplay();
 	void setDisplayStatus(bool ifDisplaying);
 	bool getDisplayStatus();
-	void checkingscore(int score);
+	void checkingscore(int score, string name);
 };
 #endif
 

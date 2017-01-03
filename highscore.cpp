@@ -19,10 +19,14 @@ void Highscore::draw()
 	dxFontForScore->setFontColor(graphicsNS::WHITE);
 	getScores();
 	int i = 0;
+	dxFontForScore->print("Position", 270, GAME_HEIGHT / 4 + (i * 25));
+	dxFontForScore->print("Name", 450, GAME_HEIGHT / 4 + (i * 25));
+	dxFontForScore->print("Score", 700, GAME_HEIGHT / 4 + (i * 25));
 	while (highScore[i] != NULL)
 	{
-		dxFontForScore->print(highscoreName.at(i), 200, GAME_HEIGHT / 4 + (i * 25));
-		dxFontForScore->print(to_string(highScore[i]),400, GAME_HEIGHT/4+(i*25));
+		dxFontForScore->print(to_string((i + 1)), 300, GAME_HEIGHT /4 + ((i+1) * 25));
+		dxFontForScore->print(scoreName[i], 450, GAME_HEIGHT / 4 + ((i + 1) * 25));
+		dxFontForScore->print(to_string(highScore[i]), 700, GAME_HEIGHT / 4 + ((i + 1) * 25));
 		i++;
 	}
 }
@@ -54,7 +58,7 @@ void Highscore::getScores()
 		{			
 				if (lineNum % 2 == 0)
 				{
-					highscoreName.push_back(line);
+					scoreName[lineNum/2] = line;
 				}
 				else
 				{
@@ -67,10 +71,10 @@ void Highscore::getScores()
 	}
 	myfile.close();	
 }
-void Highscore::setScores(int p1score, int p2score)
+void Highscore::setScores(int p1score, int p2score, string p1name, string p2name)
 {
-	checkingscore(p1score);
-	checkingscore(p2score);
+	checkingscore(p1score, p1name);
+	checkingscore(p2score, p2name);
 	ofstream myfile;
 	myfile.open("Highscore.txt");
 	int iterate=0;
@@ -78,8 +82,7 @@ void Highscore::setScores(int p1score, int p2score)
 	{
 		if (highScore[iterate] != NULL && highScore[iterate] >0 )
 		{
-			//myfile << highscoreName.at(iterate) << endl;
-			myfile << "name"<< endl;
+			myfile << scoreName[iterate] << endl;
 			myfile << highScore[iterate] << endl;
 		}
 		iterate++;
@@ -103,35 +106,40 @@ bool Highscore::getDisplayStatus()
 	return displaying;
 }
 
-void Highscore::checkingscore(int score)
+void Highscore::checkingscore(int score,string name)
 {
 
 	bool checkHighScore = true;
 	int i = 0;
+	string n = name;
+	
 	while (checkHighScore)
 	{
+		//if score is not the first one recorded(means text file not empty)
 		if (highScore[i] != NULL)
 		{
-			//check if it is in highscore for p1
 			if (score >= highScore[i])
 			{
-				for (int j = numOfTopScore; j < i; j++)
+				for (int j = numOfTopScore; j < i; j--)
 				{
 					if (highScore[j - 1] != NULL&& highScore[j - 1] > 0)
 					{
+						scoreName[j - 1] = scoreName[j];
 						highScore[j - 1] = highScore[j];
 					}
 				}
+				scoreName[i] = n;
 				highScore[i] = score;
 				checkHighScore = false;
 			}
 		}
 		else
 		{
+			scoreName[i] = n;
 			highScore[i] = score;
 			checkHighScore = false;
 		}
-		if (i > sizeof(highScore))
+		if (i > 10)
 		{
 			checkHighScore = false;
 		}

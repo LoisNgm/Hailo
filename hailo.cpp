@@ -168,39 +168,31 @@ void Hailo::render()
 	const int BUF_SIZE = 50;
 	static char buffer[BUF_SIZE];
 	graphics->spriteBegin();                // begin drawing sprites
-	if (input->wasKeyPressed(0x33))
-	{
-		gameStart = 3;
-		input->clearAll();
-	}
-	if (gameStart == 3)
-	{
-		creditPage.draw();
-		if (input->anyKeyPressed())
-		{
-			gameStart = 0;
-			input->clearAll();
-		}
-	}
-	if (gameStart == 0){
-		startPage.draw();
-		dxFontMedium->setFontColor(graphicsNS::CYAN);
-		if (Name1Enter == false)
-		{
-			dxFontMedium->print("Enter Player1's Name:", 250, GAME_HEIGHT - 100);
-		}
-		else
-		{
-			if (Name2Enter == false && Name1Enter)
+	if (gameStart == 0){			
+		if (!highscoreObj->getDisplayStatus())
+		{			
+			startPage.draw();
+			if (input->isKeyDown(0x30))
 			{
-				dxFontMedium->print("Enter Player2's Name:", 250, GAME_HEIGHT - 100);
+				PostQuitMessage(0);
 			}
-			if (Name1Enter && Name2Enter)
+			dxFontMedium->setFontColor(graphicsNS::CYAN);
+			if (Name1Enter == false)
 			{
-				dxFontMedium->print("Press Enter to Start", 300, GAME_HEIGHT - 100);
+				dxFontMedium->print("Enter Player1's Name:", 260, GAME_HEIGHT - 100);
 			}
-		}
-		
+			else
+			{
+				if (Name2Enter == false && Name1Enter)
+				{
+					dxFontMedium->print("Enter Player2's Name:", 260, GAME_HEIGHT - 100);
+				}
+				if (Name1Enter && Name2Enter)
+				{
+					dxFontMedium->print("Press Enter to Start", 300, GAME_HEIGHT - 100);
+				}
+			}
+
 			if (input->isKeyDown(VK_RETURN) && Name1Enter == false)
 			{
 				p1Name = input->getTextIn();
@@ -219,18 +211,36 @@ void Hailo::render()
 			dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 			if (input->wasKeyPressed(VK_RETURN) && Name2Enter == true && Name1Enter == true)
 			{
-				gameStart = 1;
-			}
-			if (input->isKeyDown(0x31))
-			{
 				begin = clock();
 				gameStart = 1;
 				paused = false;
+				input->clearAll();
 			}
+			
+			else if (input->isKeyDown(VK_KEY_1)){
+
+				highscoreObj->setDisplayStatus(true);
+				input->clearAll();
+			}
+			if (input->isKeyDown(VK_KEY_2))
+			{
+				gameStart = 3;
+				input->clearAll();
+			}
+		}
+		else
+		{
+			highscoreObj->draw();
+			if (input->anyKeyPressed())
+			{
+				highscoreObj->setDisplayStatus(false);
+				input->clearAll();
+			}
+		
+		}		
+
 	}
 	else if (gameStart == 1){
-		begin = clock();
-		paused = false;
 		background.draw();
 		snow.draw();
 		hail.draw();
@@ -283,12 +293,19 @@ void Hailo::render()
 		dxFontMedium->print(to_string(displayTimer()), 500, GAME_HEIGHT - 100);
 		dxFont.setFontColor(gameNS::FONT_COLOR);
 		dxFont2.setFontColor(gameNS::FONT_COLOR);
-		
-		_snprintf_s(buffer, BUF_SIZE, "%s\nHealth: %d\nScore: %d" ,p1Name.c_str(), (int)p1Health, (int)p1Score);
+		_snprintf_s(buffer, BUF_SIZE, "%s\nHealth: %d\nScore: %d", p1Name.c_str(), (int)p1Health, (int)p1Score);
 		dxFont.print(buffer, 100, GAME_HEIGHT - 100);
-
-		_snprintf_s(buffer, BUF_SIZE, "%s\nHealth: %d\nScore: %d",p2Name.c_str(), (int)p2Health, (int)p2Score);
+		_snprintf_s(buffer, BUF_SIZE, "%s\nHealth: %d\nScore: %d", p2Name.c_str(), (int)p2Health, (int)p2Score);
 		dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
+	}
+	if (gameStart == 3)
+	{
+		creditPage.draw();
+		if (input->anyKeyPressed())
+		{
+			gameStart = 0;
+			input->clearAll();
+		}
 	}
 	if (gameStart == 2)
 	{
@@ -333,7 +350,7 @@ void Hailo::render()
 				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 			}
 		}
-		highscoreObj->setScores(p1Score, p2Score);
+		highscoreObj->setScores(p1Score, p2Score, p1Name,p2Name);
 		if (input->isKeyDown(VK_ESCAPE)){
 			PostQuitMessage(0);
 		}
@@ -346,10 +363,13 @@ void Hailo::render()
 	}
 	graphics->spriteEnd();
 }
+
 void Hailo::resetAllItems()
 {
-	p1Health = 3;
-	p2Health = 3;
+	dxFont.setFontColor(graphicsNS::WHITE);
+	dxFont2.setFontColor(graphicsNS::WHITE);
+	p1Health = 30;
+	p2Health = 30;
 	p1Score = 0;
 	p2Score = 0;
 	for (int i = 0; i < (sizeof(snow_slowArrayImage) / sizeof(Image)); i++)
@@ -371,6 +391,12 @@ void Hailo::resetAllItems()
 	character2.setX(0);
 	characterWalking.setX(0);
 	characterWalking2.setX(0);
+	character.setY(GAME_HEIGHT - character.getHeight() - 160.0f);
+	character2.setY(GAME_HEIGHT - character.getHeight() - 160.0f);
+	characterWalking.setX(0);
+	characterWalking2.setX(0);
+	characterWalking.setY(GAME_HEIGHT - character.getHeight() - 160.0f);
+	characterWalking2.setY(GAME_HEIGHT - character.getHeight() - 160.0f);
 
 	JumpTimer = 0;
 	jumping = false;
@@ -1411,6 +1437,7 @@ void Hailo::importImage()
 	//credit page
 	if (!creditPage.initialize(graphics, 0, 0, 0, &creditPageTexture))
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Error initializing"));
+
 	//character type Image
 	//PLAYER 1
 	// characterWalking texture
