@@ -155,10 +155,12 @@ private:
 
 	//health and score for player 1
 	int p1Score;
+	int p1ScoreFinal;
 	int p1Health = 30;
 
 	//health and score for player 2
 	int p2Score;
+	int p2ScoreFinal;
 	int p2Health = 30;
 	bool Name1Enter = false;
 	//health and score for player 2
