@@ -90,6 +90,9 @@ void Hailo::initialize(HWND hwnd)
 	if (dxFont2.initialize(graphics, gameNS::POINT_SIZE, false, false, gameNS::FONT) == false)
 		throw(GameError(gameErrorNS::FATAL_ERROR, "Failed to initialize DirectX font."));
 
+	if (dxFontLarge.initialize(graphics, 200, false, false, gameNS::FONT) == false)
+		throw(GameError(gameErrorNS::FATAL_ERROR, "Failed to initialize DirectX font."));
+
 	// Create the sound object.
 	sounds = new Sounds;
 	if (!sounds)
@@ -311,46 +314,35 @@ void Hailo::render()
 	{
 		paused = true;
 		endPage.draw();
-		if ((timer - elapsed_secs) == 0)
+		dxFontLarge.setFontColor(gameNS::FONT_COLOR);
+		if ((timer - elapsed_secs) == 0 || p1Health == 0 || p2Health == 0)
 		{
 			if (p1Score > p2Score){
 				dxFont2.setFontColor(gameNS::FONT_COLOR_LOSE);
-				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d + %d", (int)p2Health, (int)p2Score, (int)(p2Health * 50));
+				_snprintf_s(buffer, BUF_SIZE, "%s\nHealth: %d\nScore: %d + %d", p2Name.c_str(), (int)p2Health, (int)p2Score, (int)(p2Health * 50));
 				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
 				dxFont.setFontColor(gameNS::FONT_COLOR_WIN);
-				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d + %d", (int)p1Health, (int)p1Score, (int)(p1Health * 50));
+				_snprintf_s(buffer, BUF_SIZE, "%s\nHealth: %d\nScore: %d + %d", p1Name.c_str(), (int)p1Health, (int)p1Score, (int)(p1Health * 50));
 				dxFont.print(buffer, 100, GAME_HEIGHT - 100);
+				_snprintf_s(buffer, BUF_SIZE, p1Name.c_str());
+				dxFontLarge.print(buffer, GAME_WIDTH / 4, 20);
 			}
 			else
 			{
 				dxFont.setFontColor(gameNS::FONT_COLOR_LOSE);
-				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d + %d", (int)p1Health, (int)p1Score, (int)(p1Health * 50));
+				_snprintf_s(buffer, BUF_SIZE, "%s\nHealth: %d\nScore: %d + %d", p1Name.c_str(), (int)p1Health, (int)p1Score, (int)(p1Health * 50));
 				dxFont.print(buffer, 100, GAME_HEIGHT - 100);
 				dxFont2.setFontColor(gameNS::FONT_COLOR_WIN);
-				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d + %d", (int)p2Health, (int)p2Score, (int)(p1Health * 50));
-				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
+				_snprintf_s(buffer, BUF_SIZE, "%s\nHealth: %d\nScore: %d + %d", p2Name.c_str(), (int)p2Health, (int)p2Score, (int)(p2Health * 50));
+				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100); _snprintf_s(buffer, BUF_SIZE, p1Name.c_str());
+				_snprintf_s(buffer, BUF_SIZE, p2Name.c_str());
+				dxFontLarge.print(buffer, GAME_WIDTH / 4, 20);
 			}
 		}
-		else
-		{
-			if (p1Health > p2Health){
-				dxFont2.setFontColor(gameNS::FONT_COLOR_LOSE);
-				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d + %d", (int)p2Health, (int)p2Score, (int)(p2Health * 50));
-				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
-				dxFont.setFontColor(gameNS::FONT_COLOR_WIN);
-				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d + %d", (int)p1Health, (int)p1Score, (int)(p1Health * 50));
-				dxFont.print(buffer, 100, GAME_HEIGHT - 100);
-			}
-			if (p1Health < p2Health){
-				dxFont.setFontColor(gameNS::FONT_COLOR_LOSE);
-				_snprintf_s(buffer, BUF_SIZE, "P1\nHealth: %d\nScore: %d + %d", (int)p1Health, (int)p1Score, (int)(p1Health * 50));
-				dxFont.print(buffer, 100, GAME_HEIGHT - 100);
-				dxFont2.setFontColor(gameNS::FONT_COLOR_WIN);
-				_snprintf_s(buffer, BUF_SIZE, "P2\nHealth: %d\nScore: %d + %d", (int)p2Health, (int)p2Score, (int)(p2Health * 50));
-				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
-			}
-		}
-		highscoreObj->setScores(p1Score, p2Score, p1Name,p2Name);
+		p1ScoreFinal = p1Score + (p1Health * 50);
+		p2ScoreFinal = p2Score + (p2Health * 50);
+		highscoreObj->setScores(p1ScoreFinal, p2ScoreFinal, p1Name,p2Name);
+
 		if (input->isKeyDown(VK_ESCAPE)){
 			PostQuitMessage(0);
 		}

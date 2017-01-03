@@ -43,6 +43,7 @@ protected:
 	bool    initialized;
 	TextDX  dxFont;
 	TextDX  dxFont2;
+	TextDX  dxFontLarge;
 
 public:
     // Constructor
