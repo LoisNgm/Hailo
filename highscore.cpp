@@ -24,9 +24,12 @@ void Highscore::draw()
 	dxFontForScore->print("Score", 700, GAME_HEIGHT / 4 + (i * 25));
 	while (highScore[i] != NULL)
 	{
-		dxFontForScore->print(to_string((i + 1)), 300, GAME_HEIGHT /4 + ((i+1) * 25));
-		dxFontForScore->print(scoreName[i], 450, GAME_HEIGHT / 4 + ((i + 1) * 25));
-		dxFontForScore->print(to_string(highScore[i]), 700, GAME_HEIGHT / 4 + ((i + 1) * 25));
+		if (i < 10)
+		{
+			dxFontForScore->print(to_string((i + 1)), 300, GAME_HEIGHT / 4 + ((i + 1) * 25));
+			dxFontForScore->print(scoreName[i], 450, GAME_HEIGHT / 4 + ((i + 1) * 25));
+			dxFontForScore->print(to_string(highScore[i]), 700, GAME_HEIGHT / 4 + ((i + 1) * 25));
+		}
 		i++;
 	}
 }
@@ -81,9 +84,12 @@ void Highscore::setScores(int p1score, int p2score, string p1name, string p2name
 	while (iterate<numOfTopScore)
 	{
 		if (highScore[iterate] != NULL && highScore[iterate] >0 )
-		{
+		{		
 			myfile << scoreName[iterate] << endl;
-			myfile << highScore[iterate] << endl;
+			if (iterate != 9)
+				myfile << highScore[iterate] << endl;
+			else
+				myfile << highScore[iterate];
 		}
 		iterate++;
 	}
@@ -112,38 +118,40 @@ void Highscore::checkingscore(int score,string name)
 	bool checkHighScore = true;
 	int i = 0;
 	string n = name;
-	
-	while (checkHighScore)
+	if (score > 0)
 	{
-		//if score is not the first one recorded(means text file not empty)
-		if (highScore[i] != NULL)
+		while (checkHighScore)
 		{
-			if (score >= highScore[i])
+			//if score is not the first one recorded(means text file not empty)
+			if (highScore[i] != NULL)
 			{
-				for (int j = numOfTopScore; j < i; j--)
+				if (score >= highScore[i])
 				{
-					if (highScore[j - 1] != NULL&& highScore[j - 1] > 0)
+					for (int j = numOfTopScore; j < i; j--)
 					{
-						scoreName[j - 1] = scoreName[j];
-						highScore[j - 1] = highScore[j];
+						if (highScore[j - 1] != NULL&& highScore[j - 1] > 0)
+						{
+							scoreName[j - 1] = scoreName[j];
+							highScore[j - 1] = highScore[j];
+						}
 					}
+					scoreName[i] = n;
+					highScore[i] = score;
+					checkHighScore = false;
 				}
+			}
+			else
+			{
 				scoreName[i] = n;
 				highScore[i] = score;
 				checkHighScore = false;
 			}
+			if (i > 10)
+			{
+				checkHighScore = false;
+			}
+			i++;
 		}
-		else
-		{
-			scoreName[i] = n;
-			highScore[i] = score;
-			checkHighScore = false;
-		}
-		if (i > 10)
-		{
-			checkHighScore = false;
-		}
-		i++;
 	}
 }
 

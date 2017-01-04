@@ -317,7 +317,7 @@ void Hailo::render()
 		dxFontLarge.setFontColor(gameNS::FONT_COLOR);
 		if ((timer - elapsed_secs) == 0 || p1Health == 0 || p2Health == 0)
 		{
-			if (p1Score > p2Score){
+			if (p1ScoreFinal > p2ScoreFinal){
 				dxFont2.setFontColor(gameNS::FONT_COLOR_LOSE);
 				_snprintf_s(buffer, BUF_SIZE, "%s\nHealth: %d\nScore: %d + %d", p2Name.c_str(), (int)p2Health, (int)p2Score, (int)(p2Health * 50));
 				dxFont2.print(buffer, GAME_WIDTH - 200, GAME_HEIGHT - 100);
